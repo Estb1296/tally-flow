@@ -1,7 +1,15 @@
 package com.pluralsight;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 public class AccountingApp {
     static Scanner input=new Scanner(System.in);
+    static ArrayList<Transactions> ledger;
     public static void main(String[] args) {
         System.out.println("Good to go");
         runHomeScreen();
@@ -54,7 +62,7 @@ public class AccountingApp {
                     """);
             int choice= input.nextInt();
             switch(choice){
-                case 1-> System.out.println("DisplayAllEntriesScreen");
+                case 1-> displayAllEntriesScreen();
                 case 2-> System.out.println("DepositsScreen");
                 case 3-> System.out.println("PaymentsScreen");
                 case 4-> runReportsScreen();
@@ -93,5 +101,37 @@ public class AccountingApp {
         }
         }
         runLedgerScreen();
+    }
+    public static void readTransactionsFromFile(String fileName, ArrayList<Transactions>ledger){
+        try {
+            BufferedReader reader= new BufferedReader(new FileReader(fileName));
+            String line;
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        while((line=reader.readLine())!=null){
+            String[] transactionRegistry=line.split("\\|");
+            LocalDate date = LocalDate.parse(transactionRegistry[0].trim(), dateFormatter);
+            LocalTime time = LocalTime.parse(transactionRegistry[1].trim(), timeFormatter);
+            String description = transactionRegistry[2].trim();
+            String vendor = transactionRegistry[3].trim();
+            double amount = Double.parseDouble(transactionRegistry[4].trim());
+            ledger.add(new Transactions(date,time,description,vendor,amount));
+        }
+        }
+        catch (IOException e) {
+            System.out.println("Please try to enter fileName again.");
+        }
+    }
+    public static String promptForFileName(){
+        System.out.println("what is the name of the file you want me to read from?");
+        return input.nextLine();
+    }
+    public static void loadTransactionsFromFile( ArrayList<Transactions> ledger) {
+        String fileName;
+        fileName=promptForFileName();
+        readTransactionsFromFile(fileName, ledger);
+    }
+    public static void displayAllEntriesScreen(){
+        loadTransactionsFromFile(ledger);
     }
 }
