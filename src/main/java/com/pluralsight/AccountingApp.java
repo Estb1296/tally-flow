@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 public class AccountingApp {
     static Scanner input=new Scanner(System.in);
-    static ArrayList<Transactions> ledger;
+    static ArrayList<Transactions> ledger= new ArrayList<>();
     public static void main(String[] args) {
         System.out.println("Good to go");
         runHomeScreen();
@@ -30,12 +30,17 @@ public class AccountingApp {
                 case 1-> runAddDepositScreen();
                 case 2->runMakePaymentScreen();
                 case 3-> runLedgerScreen();
-                case 4-> isRunning=false;
+                case 4-> isRunning=exitApp();
                 default-> System.out.println("Invalid input");
             }
         }
-        exitApp();
+
     }
+    private static boolean exitApp() {
+        System.out.println("You have a nice day!");
+        return false;
+    }
+
     public static void runAddDepositScreen(){
         System.out.println("How much do you want to deposit?");
         double depositAmount= input.nextDouble();
@@ -62,18 +67,13 @@ public class AccountingApp {
                     """);
             int choice= input.nextInt();
             switch(choice){
-                case 1-> displayAllEntriesScreen();
+                case 1-> displayAllEntriesScreen(ledger);
                 case 2-> System.out.println("DepositsScreen");
                 case 3-> System.out.println("PaymentsScreen");
                 case 4-> runReportsScreen();
                 case 5->isRunning=false;
-
             }
         }
-        runHomeScreen();
-    }
-    public static void exitApp(){
-        System.out.println("You have a nice day!");
     }
     public static void runReportsScreen(){
         System.out.println("this is the reports screen");
@@ -94,21 +94,25 @@ public class AccountingApp {
             case 2-> System.out.println("PreviousMonthScreen");
             case 3-> System.out.println("YearToDateScreen");
             case 4-> System.out.println("PreviousYearScreen");
-            case 5-> System.out.println("SearchByVendorScreen");
+            case 5-> searchByVendorScreen(ledger);
             case 6-> System.out.println("CustomSearchScreen (bonus search by all the listed fields at once but they are all optional)");
             case 7-> isRunning=false;
             default-> System.out.println("Invalid Input!");
         }
         }
-        runLedgerScreen();
     }
-    public static void readTransactionsFromFile(String fileName, ArrayList<Transactions>ledger){
+    public static void readTransactionsFromFile(ArrayList<Transactions>ledger){
         try {
-            BufferedReader reader= new BufferedReader(new FileReader(fileName));
+            BufferedReader reader= new BufferedReader(new FileReader("transactions.csv"));
             String line;
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        while((line=reader.readLine())!=null){
+            boolean firstLine = true;  // Add this
+            while((line = reader.readLine()) != null) {
+                if(firstLine) {  // Skip header
+                    firstLine = false;
+                    continue;
+                }
             String[] transactionRegistry=line.split("\\|");
             LocalDate date = LocalDate.parse(transactionRegistry[0].trim(), dateFormatter);
             LocalTime time = LocalTime.parse(transactionRegistry[1].trim(), timeFormatter);
@@ -116,22 +120,34 @@ public class AccountingApp {
             String vendor = transactionRegistry[3].trim();
             double amount = Double.parseDouble(transactionRegistry[4].trim());
             ledger.add(new Transactions(date,time,description,vendor,amount));
+
         }
-        }
-        catch (IOException e) {
-            System.out.println("Please try to enter fileName again.");
+        } catch (IOException e) {
+            System.out.println("Make sure the file is in your project folder.");
+
         }
     }
-    public static String promptForFileName(){
-        System.out.println("what is the name of the file you want me to read from?");
-        return input.nextLine();
+    public static void loadTransactionsFromFile(ArrayList<Transactions> ledger) {
+        readTransactionsFromFile(ledger);
     }
-    public static void loadTransactionsFromFile( ArrayList<Transactions> ledger) {
-        String fileName;
-        fileName=promptForFileName();
-        readTransactionsFromFile(fileName, ledger);
-    }
-    public static void displayAllEntriesScreen(){
+    public static void displayAllEntriesScreen(ArrayList<Transactions> ledger){
         loadTransactionsFromFile(ledger);
+        for(Transactions transaction:ledger){
+            System.out.printf("Date: %s | Time: %s | Description: %s | Vendor: %s | Amount: $%.2f%n",
+                    transaction.getDate(),transaction.getTime(),transaction.getDescription(),transaction.getVendor(),transaction.getAmount());
+        }
+    }
+    public static void searchByVendor(ArrayList<Transactions> ledger){
+        input.nextLine();
+        System.out.println("Please enter the name of the vendor you want transactions pulled up from");
+        String vendor=input.nextLine();
+        for(Transactions transaction : ledger) {
+            if(transaction.getVendor().equals(vendor)) {
+                System.out.println(transaction);
+            }
+        }
+    }
+    public static void searchByVendorScreen(ArrayList<Transactions>ledger){
+        searchByVendor(ledger);
     }
 }
