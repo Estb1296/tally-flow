@@ -1,7 +1,5 @@
 package com.pluralsight;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -12,9 +10,10 @@ public class AccountingApp {
     static ArrayList<Transactions> ledger= new ArrayList<>();
     public static void main(String[] args) {
         System.out.println("Good to go");
-        runHomeScreen();
+        promptAndLoadFileIfEmpty(ledger);
+        runHomeScreen( ledger);
     }
-    public static void runHomeScreen(){
+    public static void runHomeScreen(ArrayList<Transactions> ledger){
         System.out.println("Welcome to our humble institution");
         boolean isRunning=true;
         while(isRunning) {
@@ -27,9 +26,9 @@ public class AccountingApp {
                     """);
             int choice=input.nextInt();
             switch(choice){
-                case 1-> runAddDepositScreen();
-                case 2->runMakePaymentScreen();
-                case 3-> runLedgerScreen();
+                case 1-> runAddDepositScreen(ledger);
+                case 2->runMakePaymentScreen(ledger);
+                case 3-> runLedgerScreen(ledger);
                 case 4-> isRunning=exitApp();
                 default-> System.out.println("Invalid input");
             }
@@ -41,18 +40,13 @@ public class AccountingApp {
         return false;
     }
 
-    public static void runAddDepositScreen(){
-        System.out.println("How much do you want to deposit?");
-        double depositAmount= input.nextDouble();
-        System.out.printf("%.2f is the amount you have deposited into your account.\n",depositAmount);
+    public static void runAddDepositScreen(ArrayList<Transactions> ledger){
+        handleNewDeposit(ledger);
     }
-    public static void runMakePaymentScreen(){
-        System.out.println("The second method is working");
-        System.out.println("How much are you trying to make a payment on today?");
-        double paymentAmount=input.nextDouble();
-        System.out.printf("%.2f is the amount you paid today.\n",paymentAmount);
+    public static void runMakePaymentScreen(ArrayList<Transactions> ledger){
+       handleNewPayment(ledger);
     }
-    public static void runLedgerScreen(){
+    public static void runLedgerScreen(ArrayList<Transactions> ledger){
         System.out.println("The ledger screen is working well so far.");
         boolean isRunning=true;
         while(isRunning){
@@ -70,12 +64,12 @@ public class AccountingApp {
                 case 1-> displayAllEntriesScreen(ledger);
                 case 2-> System.out.println("DepositsScreen");
                 case 3-> System.out.println("PaymentsScreen");
-                case 4-> runReportsScreen();
+                case 4-> runReportsScreen(ledger);
                 case 5->isRunning=false;
             }
         }
     }
-    public static void runReportsScreen(){
+    public static void runReportsScreen(ArrayList<Transactions> ledger){
         System.out.println("this is the reports screen");
         boolean isRunning=true;
         while(isRunning){
@@ -101,37 +95,60 @@ public class AccountingApp {
         }
         }
     }
-    public static void readTransactionsFromFile(ArrayList<Transactions>ledger){
+    public static void readTransactionsFromFile(String filename, ArrayList<Transactions> ledger){
         try {
-            BufferedReader reader= new BufferedReader(new FileReader("transactions.csv"));
+            BufferedReader reader = new BufferedReader(new FileReader(filename));  // Use filename parameter
             String line;
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-            boolean firstLine = true;  // Add this
+            boolean firstLine = true;
+
             while((line = reader.readLine()) != null) {
-                if(firstLine) {  // Skip header
+                if(firstLine) {
                     firstLine = false;
                     continue;
                 }
-            String[] transactionRegistry=line.split("\\|");
-            LocalDate date = LocalDate.parse(transactionRegistry[0].trim(), dateFormatter);
-            LocalTime time = LocalTime.parse(transactionRegistry[1].trim(), timeFormatter);
-            String description = transactionRegistry[2].trim();
-            String vendor = transactionRegistry[3].trim();
-            double amount = Double.parseDouble(transactionRegistry[4].trim());
-            ledger.add(new Transactions(date,time,description,vendor,amount));
+                String[] transactionRegistry = line.split("\\|");
+                LocalDate date = LocalDate.parse(transactionRegistry[0].trim(), dateFormatter);
+                LocalTime time = LocalTime.parse(transactionRegistry[1].trim(), timeFormatter);
+                String description = transactionRegistry[2].trim();
+                String vendor = transactionRegistry[3].trim();
+                double amount = Double.parseDouble(transactionRegistry[4].trim());
+                ledger.add(new Transactions(date, time, description, vendor, amount));
+            }
+            reader.close();
 
-        }
+        } catch (FileNotFoundException e) {
+            // Silent - do nothing
         } catch (IOException e) {
-            System.out.println("Make sure the file is in your project folder.");
-
+            System.out.println("Error reading file: " + e.getMessage());
         }
     }
-    public static void loadTransactionsFromFile(ArrayList<Transactions> ledger) {
-        readTransactionsFromFile(ledger);
+    public static void promptAndLoadFileIfEmpty(ArrayList<Transactions> ledger) {
+        loadTransactionsFromFile("transactions.csv", ledger);
+
+        if(ledger.isEmpty()) {
+            System.out.println("No transactions found in transactions.csv");
+            System.out.println("Would you like to load a different file? (yes/no)");
+            String choice = input.nextLine().trim();
+
+            if(choice.equalsIgnoreCase("yes")) {
+                System.out.println("Enter the filename you want to load:");
+                String filename = getValidString("Filename: ");
+                loadTransactionsFromFile(filename, ledger);
+            } else {
+                System.out.println("Starting with empty ledger...\n");
+            }
+        }
+    }
+    public static void loadTransactionsFromFile(String filename, ArrayList<Transactions> ledger) {
+        readTransactionsFromFile(filename, ledger);
     }
     public static void displayAllEntriesScreen(ArrayList<Transactions> ledger){
-        loadTransactionsFromFile(ledger);
+        if(ledger.isEmpty()) {
+            System.out.println("No transactions recorded yet.");
+            return;
+        }
         for(Transactions transaction:ledger){
             System.out.printf("Date: %s | Time: %s | Description: %s | Vendor: %s | Amount: $%.2f%n",
                     transaction.getDate(),transaction.getTime(),transaction.getDescription(),transaction.getVendor(),transaction.getAmount());
@@ -149,5 +166,145 @@ public class AccountingApp {
     }
     public static void searchByVendorScreen(ArrayList<Transactions>ledger){
         searchByVendor(ledger);
+    }
+    public static void promptUserForDepositInfo(ArrayList<Transactions>ledger){
+
+        double depositAmount=getValidAmount("How much do you want to deposit?");
+        System.out.printf("%.2f is the amount you have deposited into your account.\n",depositAmount);
+
+        String vendor = getValidString("What is the source of funds of the deposit?");
+
+        String description=getValidString("What is the description of said deposit?");
+
+        LocalDate date = getValidDate("What is the date the deposit was made?");
+        LocalTime time=LocalTime.now();
+        ledger.add(new Transactions(date,time,description,vendor,depositAmount));
+
+    }
+    public static void addDepositToLedger(ArrayList<Transactions>ledger){
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
+            Transactions lastDeposit= ledger.get(ledger.size()-1);
+            String line = String.format("%s|%s|%s|%s|%.2f%n", lastDeposit.getDate(), lastDeposit.getTime(), lastDeposit.getDescription(), lastDeposit.getVendor(), lastDeposit.getAmount());
+            writer.write(line);
+            writer.close();
+
+
+            System.out.println("Deposit recorded successfully!");
+
+        } catch (IOException e) {
+            System.out.println("Unable to record transaction. Try again later.");
+        }
+    }
+    public static void handleNewDeposit(ArrayList<Transactions> ledger){
+        promptUserForDepositInfo(ledger);
+        addDepositToLedger(ledger);
+    }
+    public static void promptUserForPaymentInfo(ArrayList<Transactions>ledger){
+
+        double paymentAmount = getValidAmount("How much was the payment?");
+        System.out.printf("%.2f is the amount you have paid from your account.%n", paymentAmount);
+
+        input.nextLine();
+
+
+        String vendor = getValidString("What is the recipient of the payment?");
+
+        String description = getValidString("What is the description of said payment?");
+
+        LocalDate date = getValidDate("What is the date the payment was made?");
+        LocalTime time = LocalTime.now();
+
+        ledger.add(new Transactions(date, time, description, vendor, paymentAmount));
+    }
+    public static void processPaymentMade(ArrayList<Transactions>ledger){
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
+            Transactions lastPayment = ledger.get(ledger.size() - 1);
+            String line = String.format("%s|%s|%s|%s|%.2f%n",
+                    lastPayment.getDate(),
+                    lastPayment.getTime(),
+                    lastPayment.getDescription(),
+                    lastPayment.getVendor(),
+                    lastPayment.getAmount());
+            writer.write(line);
+            writer.close();
+
+            System.out.println("Payment recorded successfully!");
+
+        } catch (IOException e) {
+            System.out.println("Unable to record transaction. Try again later.");
+        }
+    }
+    public static void handleNewPayment(ArrayList<Transactions> ledger){
+        promptUserForPaymentInfo(ledger);
+        processPaymentMade(ledger);
+    }
+    public static LocalDate getValidDate(String prompt) {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        boolean validDate = false;
+        LocalDate date = null;
+
+        while(!validDate) {
+            try {
+                System.out.println(prompt);
+                System.out.println("(Format: yyyy-MM-dd)");
+                date = LocalDate.parse(input.nextLine(), dateFormatter);
+                validDate = true;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please use yyyy-MM-dd (example: 2026-04-25)");
+            }
+        }
+
+        return date;
+    }
+    public static double getValidAmount(String prompt) {
+        boolean validAmount = false;
+        double amount = 0;
+
+        while(!validAmount) {
+            try {
+                System.out.println(prompt);
+                amount = input.nextDouble();
+
+                if(amount <= 0) {
+                    System.out.println("Amount must be greater than zero.");
+                    input.nextLine();
+                    continue;
+                }
+
+                validAmount = true;
+                input.nextLine();  // Clear buffer
+
+            } catch (Exception e) {
+                input.nextLine();  // Clear buffer
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        return amount;
+    }
+
+    public static String getValidString(String prompt) {
+        String userInput = "";
+        boolean validInput = false;
+
+        while(!validInput) {
+            try {
+                System.out.println(prompt);
+                userInput = input.nextLine().trim();
+
+                if(userInput.isEmpty()) {
+                    System.out.println("Input cannot be empty. Please try again.");
+                    continue;
+                }
+
+                validInput = true;
+
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please try again.");
+            }
+        }
+        return userInput;
     }
 }
