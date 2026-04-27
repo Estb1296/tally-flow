@@ -3,8 +3,9 @@ package com.pluralsight;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+
 public class Transactions {
-    public LocalDate date;
+    private LocalDate date;
     public LocalTime time;
     public String description;
     public String vendor;
@@ -35,5 +36,29 @@ public class Transactions {
     public double getAmount() {
         return amount;
     }
-
+    public boolean isDeposit(){
+        return amount>0;
+    }
+    public boolean isPayment(){
+        return amount<0;
+    }
+    public boolean isFromPreviousYear() {
+        int currentYear = LocalDate.now().getYear();
+        int previousYear = currentYear - 1;
+        return date.getYear() == previousYear;
+    }
+    public boolean isFromPreviousMonth(){
+        int currentMonth = LocalDate.now().getMonthValue();
+        int previousMonth = currentMonth-1;
+        return date.getMonthValue()==previousMonth;
+    }
+    public boolean isYearToDate(){
+        LocalDate currentDate =LocalDate.now();
+        int currentYear=currentDate.getYear();
+        return (this.date.getYear()==currentYear)&&(this.date.isBefore(currentDate)||this.date.isEqual(currentDate));
+     }
+     public boolean isMonthToDate(){
+        LocalDate currentDate=LocalDate.now();
+        return this.date.getMonthValue()==currentDate.getMonthValue()&&this.date.getYear()==currentDate.getYear()&&this.date.isBefore(currentDate)||this.date.isEqual(currentDate);
+     }
 }

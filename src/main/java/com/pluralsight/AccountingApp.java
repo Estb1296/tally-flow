@@ -62,8 +62,8 @@ public class AccountingApp {
             int choice= input.nextInt();
             switch(choice){
                 case 1-> displayAllEntriesScreen(ledger);
-                case 2-> System.out.println("DepositsScreen");
-                case 3-> System.out.println("PaymentsScreen");
+                case 2-> depositsScreen(ledger);
+                case 3-> paymentsScreen(ledger);
                 case 4-> runReportsScreen(ledger);
                 case 5->isRunning=false;
             }
@@ -84,10 +84,10 @@ public class AccountingApp {
                 """);
         int choice=input.nextInt();
         switch(choice){
-            case 1-> System.out.println("MonthToDateScreen");
-            case 2-> System.out.println("PreviousMonthScreen");
-            case 3-> System.out.println("YearToDateScreen");
-            case 4-> System.out.println("PreviousYearScreen");
+            case 1-> monthToDateScreen(ledger);
+            case 2-> previousMonthScreen(ledger);
+            case 3-> yearToDateScreen(ledger);
+            case 4-> previousYearScreen(ledger);
             case 5-> searchByVendorScreen(ledger);
             case 6-> System.out.println("CustomSearchScreen (bonus search by all the listed fields at once but they are all optional)");
             case 7-> isRunning=false;
@@ -157,10 +157,17 @@ public class AccountingApp {
     public static void searchByVendor(ArrayList<Transactions> ledger){
         input.nextLine();
         System.out.println("Please enter the name of the vendor you want transactions pulled up from");
-        String vendor=input.nextLine();
+        String vendor=input.nextLine().trim();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         for(Transactions transaction : ledger) {
-            if(transaction.getVendor().equals(vendor)) {
-                System.out.println(transaction);
+            if(transaction.getVendor().equalsIgnoreCase(vendor)) {
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        transaction.getDate().format(dateFormatter),
+                        transaction.getTime().format(timeFormatter),
+                        transaction.getDescription(),
+                        transaction.getVendor(),
+                        transaction.getAmount());
             }
         }
     }
@@ -183,9 +190,10 @@ public class AccountingApp {
     }
     public static void addDepositToLedger(ArrayList<Transactions>ledger){
         try {
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
             Transactions lastDeposit= ledger.get(ledger.size()-1);
-            String line = String.format("%s|%s|%s|%s|%.2f%n", lastDeposit.getDate(), lastDeposit.getTime(), lastDeposit.getDescription(), lastDeposit.getVendor(), lastDeposit.getAmount());
+            String line = String.format("%s|%s|%s|%s|%.2f%n", lastDeposit.getDate(), lastDeposit.getTime().format(timeFormatter), lastDeposit.getDescription(), lastDeposit.getVendor(), lastDeposit.getAmount());
             writer.write(line);
             writer.close();
 
@@ -219,10 +227,11 @@ public class AccountingApp {
     }
     public static void processPaymentMade(ArrayList<Transactions>ledger){
         try {
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
             Transactions lastPayment = ledger.get(ledger.size() - 1);
             String line = String.format("%s|%s|%s|%s|%.2f%n",
-                    lastPayment.getDate(),
+                    lastPayment.getDate().format(timeFormatter),
                     lastPayment.getTime(),
                     lastPayment.getDescription(),
                     lastPayment.getVendor(),
@@ -306,5 +315,114 @@ public class AccountingApp {
             }
         }
         return userInput;
+    }
+    public static void displayDeposits(ArrayList<Transactions>ledger){
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        for(Transactions transaction:ledger){
+            if(transaction.isDeposit()){
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        transaction.getDate().format(dateFormatter),
+                        transaction.getTime().format(timeFormatter),
+                        transaction.getDescription(),
+                        transaction.getVendor(),
+                        transaction.getAmount());
+            }
+        }
+    }
+    public static void displayPayments(ArrayList<Transactions>ledger){
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        for(Transactions transaction:ledger){
+            if(transaction.isPayment()){
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        transaction.getDate().format(dateFormatter),
+                        transaction.getTime().format(timeFormatter),
+                        transaction.getDescription(),
+                        transaction.getVendor(),
+                        transaction.getAmount());
+            }
+        }
+    }
+    public static void depositsScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All deposits are as follows==========");
+        displayDeposits(ledger);
+    }
+    public static void paymentsScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All payments processed are as follows==========");
+        displayPayments(ledger);
+    }
+
+    public static void previousYearSearch(ArrayList<Transactions>ledger){
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    for(Transactions transaction : ledger) {
+                if(transaction.isFromPreviousYear()) {
+                    System.out.printf("%s|%s|%s|%s|%.2f%n",
+                            transaction.getDate().format(dateFormatter),
+                            transaction.getTime().format(timeFormatter),
+                            transaction.getDescription(),
+                            transaction.getVendor(),
+                            transaction.getAmount());
+                }
+            }
+     }
+     public static void previousMonthSearch(ArrayList<Transactions>ledger){
+     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+     for(Transactions transaction : ledger){
+            if(transaction.isFromPreviousMonth()){
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        transaction.getDate().format(dateFormatter),
+                        transaction.getTime().format(timeFormatter),
+                        transaction.getDescription(),
+                        transaction.getVendor(),
+                        transaction.getAmount());
+            }
+     }
+     }
+    public static void yearToDate(ArrayList<Transactions>ledger){
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    for(Transactions transaction:ledger){
+        if(transaction.isYearToDate()){
+            System.out.printf("%s|%s|%s|%s|%.2f%n",
+                    transaction.getDate().format(dateFormatter),
+                    transaction.getTime().format(timeFormatter),
+                    transaction.getDescription(),
+                    transaction.getVendor(),
+                    transaction.getAmount());
+        }
+    }
+    }
+    public static void monthToDate(ArrayList<Transactions>ledger){
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    for(Transactions transaction:ledger){
+        if(transaction.isMonthToDate()){
+            System.out.printf("%s|%s|%s|%s|%.2f%n",
+                    transaction.getDate().format(dateFormatter),
+                    transaction.getTime().format(timeFormatter),
+                    transaction.getDescription(),
+                    transaction.getVendor(),
+                    transaction.getAmount());
+        }
+    }
+    }
+    public static void previousMonthScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All Transactions are as follows==========");
+        previousMonthSearch(ledger);
+    }
+    public static void monthToDateScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All Transactions are as follows==========");
+        monthToDate(ledger);
+    }
+    public static void yearToDateScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All Transactions are as follows==========");
+        yearToDate(ledger);
+    }
+    public static void previousYearScreen(ArrayList<Transactions>ledger){
+        System.out.println("==========All Transactions are as follows==========");
+        previousYearSearch(ledger);
     }
 }
