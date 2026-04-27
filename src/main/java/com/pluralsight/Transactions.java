@@ -48,9 +48,10 @@ public class Transactions {
         return date.getYear() == previousYear;
     }
     public boolean isFromPreviousMonth(){
-        int currentMonth = LocalDate.now().getMonthValue();
-        int previousMonth = currentMonth-1;
-        return date.getMonthValue()==previousMonth;
+        LocalDate today = LocalDate.now();
+        LocalDate previousMonth = today.minusMonths(1);  // Handles year rollover automatically
+        return this.date.getMonthValue() == previousMonth.getMonthValue() &&
+                this.date.getYear() == previousMonth.getYear();
     }
     public boolean isYearToDate(){
         LocalDate currentDate =LocalDate.now();

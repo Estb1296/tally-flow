@@ -119,7 +119,7 @@ public class AccountingApp {
             reader.close();
 
         } catch (FileNotFoundException e) {
-            // Silent - do nothing
+            System.out.println("Error File not found!");
         } catch (IOException e) {
             System.out.println("Error reading file: " + e.getMessage());
         }
@@ -366,7 +366,7 @@ public class AccountingApp {
         System.out.printf("$%.2f is the total payment made for the previous month.\n",previousYearPaymentTotal);
         System.out.printf("$%.2f is the total net for this year so far.\n",previousYearTotal);
      }
-     public static void previousMonthSearch(ArrayList<Transactions>ledger){
+    public static void previousMonthSearch(ArrayList<Transactions>ledger){
      DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
      DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
      double previousMonthTotal=0;
@@ -381,13 +381,14 @@ public class AccountingApp {
                         transaction.getDescription(),
                         transaction.getVendor(),
                         transaction.getAmount());
-                if(transaction.isDeposit()){
-                    previousMonthDepositTotal+= transaction.total();
-                }
-                if(transaction.isPayment()){
-                    previousMonthPaymentTotal+= transaction.total();
-                }
-                previousMonthTotal+= transaction.total();
+
+                        if(transaction.isDeposit()){
+                            previousMonthDepositTotal += transaction.total();  // Use getAmount()
+                        }
+                        if(transaction.isPayment()){
+                            previousMonthPaymentTotal += transaction.total();  // Use getAmount()
+                        }
+                        previousMonthTotal += transaction.total();  // Use getAmount()
             }
      }
          System.out.println("=============");
@@ -411,11 +412,12 @@ public class AccountingApp {
                     transaction.getVendor(),
                     transaction.getAmount());
             if(transaction.isDeposit()){
-                yearToDateDepositTotal+= transaction.total();
+                yearToDateDepositTotal += transaction.total();  // Use getAmount()
             }
             if(transaction.isPayment()){
-                yearToDatePaymentTotal+= transaction.total();
+                yearToDatePaymentTotal+= transaction.total();  // Use getAmount()
             }
+            //yearToDateTotal += transaction.getAmount();
             yearToDateTotal+= transaction.total();
         }
     }
@@ -505,10 +507,18 @@ public class AccountingApp {
         searchByVendor(ledger);
     }
     public static void customSearch(ArrayList<Transactions>ledger){
-        System.out.println("What is the vendor of the transaction you are looking for?");
-        String vendor=input.nextLine();
-        System.out.println("What is the date of the transaction you are looking for?");
-        //LocalDate inputDate=input.nextLine().dateFormat;
-        System.out.println();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        System.out.println("=== CUSTOM SEARCH ===");
+        String vendorFilter = getOptionalString("What is the vendor name (or press Enter to skip): ");
+        String descriptionFilter = getOptionalString("What is the description for the transaction(or press Enter to skip): ");
+        String dateRangeChoice = getOptionalString("Search by date range? (yes/no, or press Enter to skip): ");
+        String typeFilter = getOptionalString("Filter by type (deposit/payment/all, or press Enter for all): ");
+        String amountRangeChoice = getOptionalString("Search by amount range? (yes/no, or press Enter to skip): ");
+
+    }
+    public static String getOptionalString(String prompt) {
+        System.out.println(prompt);
+        return input.nextLine().trim();
     }
 }
