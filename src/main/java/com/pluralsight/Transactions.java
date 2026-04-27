@@ -61,4 +61,9 @@ public class Transactions {
         LocalDate currentDate=LocalDate.now();
         return this.date.getMonthValue()==currentDate.getMonthValue()&&this.date.getYear()==currentDate.getYear()&&this.date.isBefore(currentDate)||this.date.isEqual(currentDate);
      }
+    public double total(){
+        double totalAmount=0;
+         totalAmount = totalAmount + this.amount;
+         return totalAmount;
+    }
 }
