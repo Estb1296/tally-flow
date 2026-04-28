@@ -194,8 +194,7 @@ public class AccountingApp {
     }
 
     public static void promptUserForDepositInfo(ArrayList<Transactions> ledger) {
-
-        double depositAmount = getValidAmount("How much do you want to deposit?");
+        double depositAmount = getValidDeposit("How much do you want to deposit?");
         System.out.printf("%.2f is the amount you have deposited into your account.\n", depositAmount);
 
         String vendor = getValidString("What is the source of funds of the deposit?");
@@ -232,31 +231,24 @@ public class AccountingApp {
 
     public static void promptUserForPaymentInfo(ArrayList<Transactions> ledger) {
 
-        double paymentAmount = getValidAmount("How much was the payment?");
-        System.out.printf("%.2f is the amount you have paid from your account.%n", paymentAmount);
-
-        input.nextLine();
-
-
+        double paymentAmount = getValidPayment("How much was the payment?");
+        System.out.printf("%.2f is the amount you have paid from your account\n", paymentAmount);
         String vendor = getValidString("What is the recipient of the payment?");
-
         String description = getValidString("What is the description of said payment?");
-
         LocalDate date = getValidDate("What is the date the payment was made?");
         LocalTime time = LocalTime.now();
-
         ledger.add(new Transactions(date, time, description, vendor, paymentAmount));
     }
 
     public static void processPaymentMade(ArrayList<Transactions> ledger) {
         try {
-            sortByMostRecent(ledger);
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
             Transactions lastPayment = ledger.get(ledger.size() - 1);
             String line = format("%s|%s|%s|%s|%.2f%n",
-                    lastPayment.getDate().format(timeFormatter),
-                    lastPayment.getTime(),
+                    lastPayment.getDate().format(dateFormatter),
+                    lastPayment.getTime().format(timeFormatter),
                     lastPayment.getDescription(),
                     lastPayment.getVendor(),
                     lastPayment.getAmount());
@@ -277,6 +269,7 @@ public class AccountingApp {
 
     public static LocalDate getValidDate(String prompt) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         boolean validDate = false;
         LocalDate date = null;
 
@@ -284,17 +277,20 @@ public class AccountingApp {
             try {
                 System.out.println(prompt);
                 System.out.println("(Format: yyyy-MM-dd)");
-                date = LocalDate.parse(input.nextLine(), dateFormatter);
+                String userInput=input.nextLine().trim();
+                if(userInput.isEmpty()) {
+                    date = LocalDate.now();
+                }else{
+                    date = LocalDate.parse(userInput, dateFormatter);
+                }
                 validDate = true;
             } catch (Exception e) {
                 System.out.println("Invalid date format. Please use yyyy-MM-dd (example: 2026-04-25)");
             }
         }
-
         return date;
     }
-
-    public static double getValidAmount(String prompt) {
+    public static double getValidDeposit(String prompt) {
         boolean validAmount = false;
         double amount = 0;
 
@@ -320,8 +316,52 @@ public class AccountingApp {
 
         return amount;
     }
+    public static double getValidPayment(String prompt) {
+        boolean validAmount = false;
+        double amount = 0;
 
-    public static String getValidString(String prompt) {
+        while (!validAmount) {
+            try {
+                System.out.println(prompt);
+                amount = input.nextDouble();
+
+                if (amount >= 0) {
+                    System.out.println("Amount must be less than zero.");
+                    input.nextLine();
+                    continue;
+                }
+
+                validAmount = true;
+                input.nextLine();  // Clear buffer
+
+            } catch (Exception e) {
+                input.nextLine();  // Clear buffer
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        return amount;
+    }
+    public static double getValidAmount(String prompt) {
+        boolean validAmount = false;
+        double amount = 0;
+
+        while (!validAmount) {
+            try {
+                System.out.println(prompt);
+                amount = input.nextDouble();
+                validAmount = true;
+                input.nextLine();  // Clear buffer
+
+            } catch (Exception e) {
+                input.nextLine();  // Clear buffer
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        return amount;
+    }
+    public static String getValidString(String prompt) {//clear buffer
         String userInput = "";
         boolean validInput = false;
 
@@ -537,14 +577,23 @@ public class AccountingApp {
         LocalDate endDate = null;
         double minAmount = Double.NEGATIVE_INFINITY;
         double maxAmount = Double.POSITIVE_INFINITY;
+        // Get date range if requested
         if (dateRangeChoice.equalsIgnoreCase("yes")) {
             startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
             endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
+            while(startDate.isBefore(endDate)){
+                System.out.println("The end date can not be before the start date");
+                endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
+            }
         }
         // Get amount range if requested
         if (amountRangeChoice.equalsIgnoreCase("yes")) {
             minAmount = getValidAmount("Enter minimum amount: ");
             maxAmount = getValidAmount("Enter maximum amount: ");
+            while(maxAmount<minAmount){
+            System.out.println("The maximum amount has to be greater than the minimum");
+            maxAmount = getValidAmount("Enter maximum amount: ");
+            }
         }
         boolean usePartialMatch = isUsePartialMatch();
         //printStandaloneTitle("Custom Search",96,146);
