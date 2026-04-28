@@ -581,7 +581,7 @@ public class AccountingApp {
         if (dateRangeChoice.equalsIgnoreCase("yes")) {
             startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
             endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
-            while(startDate.isBefore(endDate)){
+            while(endDate.isBefore(startDate)){
                 System.out.println("The end date can not be before the start date");
                 endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
             }
