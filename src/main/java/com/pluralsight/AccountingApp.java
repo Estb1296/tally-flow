@@ -89,7 +89,7 @@ public class AccountingApp {
             case 3-> yearToDateScreen(ledger);
             case 4-> previousYearScreen(ledger);
             case 5-> searchByVendorScreen(ledger);
-            case 6-> System.out.println("CustomSearchScreen (bonus search by all the listed fields at once but they are all optional)");
+            case 6-> customSearchScreen(ledger);
             case 7-> isRunning=false;
             default-> System.out.println("Invalid Input!");
         }
@@ -510,15 +510,80 @@ public class AccountingApp {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         System.out.println("=== CUSTOM SEARCH ===");
+        input.nextLine(); //clean buffer
         String vendorFilter = getOptionalString("What is the vendor name (or press Enter to skip): ");
         String descriptionFilter = getOptionalString("What is the description for the transaction(or press Enter to skip): ");
         String dateRangeChoice = getOptionalString("Search by date range? (yes/no, or press Enter to skip): ");
         String typeFilter = getOptionalString("Filter by type (deposit/payment/all, or press Enter for all): ");
         String amountRangeChoice = getOptionalString("Search by amount range? (yes/no, or press Enter to skip): ");
+        double totalAmount=0;
+        int resultCount=0;
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        double minAmount = Double.NEGATIVE_INFINITY;
+        double maxAmount = Double.POSITIVE_INFINITY;
+        if(dateRangeChoice.equalsIgnoreCase("yes")) {
+            startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
+            endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
+        }
+        // Get amount range if requested
+        if(amountRangeChoice.equalsIgnoreCase("yes")) {
+            minAmount = getValidAmount("Enter minimum amount: ");
+            maxAmount = getValidAmount("Enter maximum amount: ");
+        }
+        for(Transactions transaction:ledger){
+            boolean matches= vendorFilter.isEmpty() || transaction.getVendor().equalsIgnoreCase(vendorFilter);
 
+            // Check description filter
+            if(!vendorFilter.isEmpty() && !transaction.getVendor().equalsIgnoreCase(vendorFilter)) {
+                matches = false;
+            }
+            if(!descriptionFilter.isEmpty() && !transaction.getDescription().equalsIgnoreCase(descriptionFilter)) {
+                matches = false;
+            }
+
+            // Check date range filter
+            if(startDate != null && endDate != null) {
+                if(!transaction.getDate().isAfter(startDate.minusDays(1)) ||
+                        !transaction.getDate().isBefore(endDate.plusDays(1))) {
+                    matches = false;
+                }
+            }
+
+            // Check type filter
+            if(!typeFilter.isEmpty() && !typeFilter.equalsIgnoreCase("all")) {
+                if(typeFilter.equalsIgnoreCase("deposit") && !transaction.isDeposit()) {
+                    matches = false;
+                }
+                if(typeFilter.equalsIgnoreCase("payment") && !transaction.isPayment()) {
+                    matches = false;
+                }
+            }
+
+            // Check amount range filter
+            if(transaction.getAmount() < minAmount || transaction.getAmount() > maxAmount) {
+                matches = false;
+            }
+            if(matches){
+                System.out.printf("%s|%s|%s|%s|%.2f%n",
+                        transaction.getDate().format(dateFormatter),
+                        transaction.getTime().format(timeFormatter),
+                        transaction.getDescription(),
+                        transaction.getVendor(),
+                        transaction.getAmount());
+                totalAmount += transaction.getAmount();
+                resultCount++;
+            }
+        }
+        System.out.println("=============");
+        System.out.printf("Results found: %d\n", resultCount);
+        System.out.printf("Total: $%.2f\n", totalAmount);
     }
     public static String getOptionalString(String prompt) {
         System.out.println(prompt);
         return input.nextLine().trim();
+    }
+    public static void customSearchScreen(ArrayList<Transactions>ledger){
+        customSearch(ledger);
     }
 }
