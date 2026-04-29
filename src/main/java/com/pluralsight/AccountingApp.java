@@ -34,7 +34,7 @@ public class AccountingApp {
             System.out.println("How can we assist you today? Please pick and enter the numbers associated with each menu item.");
             System.out.println(border);
             System.out.println("""
-                    (1) AddDeposit
+                    (1) Add Deposit
                     (2) Make Payment
                     (3) Ledger
                     (4) Exit
