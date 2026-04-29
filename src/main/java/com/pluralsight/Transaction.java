@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 
-public class Transactions {
+public class Transaction {
     private final LocalDate date;
     public LocalTime time;
     public String description;
     public String vendor;
     public double amount;
-    Transactions(LocalDate date, LocalTime time, String description, String vendor, Double amount){
+    Transaction(LocalDate date, LocalTime time, String description, String vendor, Double amount){
         this.date=date;
         this.time=time;
         this.description=description;
