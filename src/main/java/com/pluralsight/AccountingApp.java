@@ -14,8 +14,8 @@ public class AccountingApp {
     public static final String RESET = "\u001B[0m";
     public static final String RED = "\u001B[31m";
     public static final String GREEN = "\u001B[32m";
-   // public static final String YELLOW = "\u001B[33m";
-    //public static final String CYAN = "\u001B[36m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String CYAN = "\u001B[36m";
 
     public static void main(String[] args) {
         System.out.println("Good to go");
@@ -183,14 +183,18 @@ public class AccountingApp {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         // This fills the %s at the very end
-        return String.format("Date: %-12s | Time: %-12s | Description: %-25s | Vendor: %-26s | Amount: %s$%8.2f%s%n",
-                transaction.getDate().format(dateFormatter),
-                transaction.getTime().format(timeFormatter),
-                transaction.getDescription(),
-                transaction.getVendor(),
-                color,                   // This fills the first %s before the $
-                transaction.getAmount(), // This fills the %8.2f
-                RESET);
+        return String.format("%sDate: %-12s | Time: %-12s%s | %sDescription: %-25s | Vendor: %-26s%s | Amount: %s$%8.2f%s%n",
+                CYAN,                                                 // 1st %s - cyan color
+                transaction.getDate().format(dateFormatter),         // 2nd %s - date
+                transaction.getTime().format(timeFormatter),        // 3rd %s - time
+                RESET,                                             // 4th %s - reset color
+                YELLOW,                                           // 5th %s - yellow color
+                transaction.getDescription(),                    // 6th %s - description
+                transaction.getVendor(),                        // 7th %s - vendor
+                RESET,                                         // 8th %s - reset color
+                color,                                        // 9th %s - amount color
+                transaction.getAmount(),                     // %8.2f - amount (different format)
+                RESET);                                     // 10th %s - reset color
     }
 
     public static void promptUserForDepositInfo(ArrayList<Transactions> ledger) {
@@ -712,7 +716,7 @@ public class AccountingApp {
 
         // This creates the leading spaces, adds the text,
         // then adds enough trailing spaces to hit the total width.
-        return String.format("%" + (padding + text.length()) + "s", text)
-                + String.format("%" + (width - (padding + text.length())) + "s", "");
+        return format("%" + (padding + text.length()) + "s", text)
+                + format("%" + (width - (padding + text.length())) + "s", "");
     }
 }
