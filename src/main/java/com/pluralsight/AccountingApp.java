@@ -17,7 +17,7 @@ public class AccountingApp {
     public static final String GREEN = "\u001B[32m";
     public static final String YELLOW = "\u001B[33m";
     public static final String CYAN = "\u001B[36m";
-
+    private static final String border = "=".repeat(131);
 
     public static void main(String[] args) {
         System.out.println("Good to go");
@@ -448,11 +448,11 @@ public class AccountingApp {
                 previousYearTotal += transaction.total();
             }
         }
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
         System.out.printf("$%.2f is the total deposit for the previous year.\n", previousYearDepositTotal);
         System.out.printf("$%.2f is the total payment made for the previous year.\n", previousYearPaymentTotal);
         System.out.printf("$%.2f is the total net for the previous year.\n", previousYearTotal);
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
     }
 
     public static void previousMonthSearch(ArrayList<Transactions> ledger) {
@@ -473,11 +473,11 @@ public class AccountingApp {
                 previousMonthTotal += transaction.total();  // Use getAmount()
             }
         }
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
         System.out.printf("$%.2f is the total deposit for the previous month.\n", previousMonthDepositTotal);
         System.out.printf("$%.2f is the total payment made for the previous month.\n", previousMonthPaymentTotal);
         System.out.printf("$%.2f is the total net for the previous month.\n", previousMonthTotal);
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
     }
 
     public static void yearToDate(ArrayList<Transactions> ledger) {
@@ -499,11 +499,11 @@ public class AccountingApp {
                 yearToDateTotal += transaction.total();
             }
         }
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
         System.out.printf("$%.2f is the total deposit for this year so far.\n", yearToDateDepositTotal);
         System.out.printf("$%.2f is the total payment made for this year so far.\n", yearToDatePaymentTotal);
         System.out.printf("$%.2f is the total net for this year so far.\n", yearToDateTotal);
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
     }
 
     public static void monthToDate(ArrayList<Transactions> ledger) {
@@ -524,11 +524,11 @@ public class AccountingApp {
                 monthTotal += transaction.total();
             }
         }
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
         System.out.printf("$%.2f is the total deposit for this month so far.\n", monthDepositTotal);
         System.out.printf("$%.2f is the total payment made for this month so far.\n", monthPaymentTotal);
         System.out.printf("$%.2f is the total net for this month so far.\n", monthTotal);
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
     }
 
     public static void searchByVendor(ArrayList<Transactions> ledger) {
@@ -547,10 +547,10 @@ public class AccountingApp {
                 totalAmount += transaction.getAmount();
             }
         }
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
         System.out.printf("Results found: %d\n", resultCount);
         System.out.printf("Total: $%.2f\n", totalAmount);
-        System.out.println("===========================================================================================================================================");
+        System.out.println(border);
     }
 
     public static void sortByMostRecent(ArrayList<Transactions> ledger) {
