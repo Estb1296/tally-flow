@@ -171,13 +171,23 @@ public class AccountingApp {
             return;
         }
         sortByMostRecent(ledger);
+        double totalEntries=0;
+        int entriesCount=0;
 
         printStandaloneTitle("All Entries", 96, 146);
         for (Transactions transaction : ledger) {
             String look = getLook(transaction);
 
-            System.out.print(look); // Use print() because %n already adds a newline
+            System.out.print(look);
+            totalEntries+=transaction.total();
+            entriesCount++;
+            // Use print() because %n already adds a newline
         }
+        String color = totalEntries >= 0 ? GREEN : RED;
+        System.out.println(border);
+        System.out.printf("%s$%.2f%s is the total of all the entries made onn this ledger. \n",color,totalEntries,RESET);
+        System.out.printf("%d is the number of entries made on this ledger.\n",entriesCount);
+        System.out.println(border);
     }
 
     private static String getLook(Transactions transaction) {
@@ -402,22 +412,38 @@ public class AccountingApp {
 
     public static void displayDeposits(ArrayList<Transactions> ledger) {
         sortByMostRecent(ledger);
+        double depositTotal=0;
+        int depositCount=0;
         for (Transactions transaction : ledger) {
             if (transaction.isDeposit()) {
                 String look = getLook(transaction);
                 System.out.println(look);
+                depositTotal+= transaction.total();
+                depositCount++;
             }
         }
+        System.out.println(border);
+        System.out.printf("%s$%.2f%s is the total ($)amount of deposits made on this ledger.\n",GREEN,depositTotal,RESET);
+        System.out.printf("%d is the total count of deposits made on the ledger.\n",depositCount);
+        System.out.println(border);
     }
 
     public static void displayPayments(ArrayList<Transactions> ledger) {
         sortByMostRecent(ledger);
+        double paymentTotal=0;
+        int paymentCount=0;
         for (Transactions transaction : ledger) {
             if (transaction.isPayment()) {
                 String look = getLook(transaction);
                 System.out.println(look);
+                paymentTotal+= transaction.total();
+                paymentCount++;
             }
         }
+        System.out.println(border);
+        System.out.printf("%s$%.2f%s is the total ($)amount of payments made on this ledger.\n",RED,paymentTotal,RESET);
+        System.out.printf("%d is the total count of payments made on the ledger.\n",paymentCount);
+        System.out.println(border);
     }
 
     public static void depositsScreen(ArrayList<Transactions> ledger) {
@@ -448,10 +474,11 @@ public class AccountingApp {
                 previousYearTotal += transaction.total();
             }
         }
+        String color = previousYearTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("$%.2f is the total deposit for the previous year.\n", previousYearDepositTotal);
-        System.out.printf("$%.2f is the total payment made for the previous year.\n", previousYearPaymentTotal);
-        System.out.printf("$%.2f is the total net for the previous year.\n", previousYearTotal);
+        System.out.printf("%s$%.2f%s is the total deposit for the previous year.\n",GREEN, previousYearDepositTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for the previous year.\n",RED, previousYearPaymentTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total net for the previous year.\n",color, previousYearTotal,RESET);
         System.out.println(border);
     }
 
@@ -473,10 +500,11 @@ public class AccountingApp {
                 previousMonthTotal += transaction.total();  // Use getAmount()
             }
         }
+        String color = previousMonthTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("$%.2f is the total deposit for the previous month.\n", previousMonthDepositTotal);
-        System.out.printf("$%.2f is the total payment made for the previous month.\n", previousMonthPaymentTotal);
-        System.out.printf("$%.2f is the total net for the previous month.\n", previousMonthTotal);
+        System.out.printf("%s$%.2f%s is the total deposit for the previous month.\n",GREEN, previousMonthDepositTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for the previous month.\n",RED, previousMonthPaymentTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total net for the previous month.\n",color, previousMonthTotal,RESET);
         System.out.println(border);
     }
 
@@ -499,10 +527,11 @@ public class AccountingApp {
                 yearToDateTotal += transaction.total();
             }
         }
+        String color = yearToDateTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("$%.2f is the total deposit for this year so far.\n", yearToDateDepositTotal);
-        System.out.printf("$%.2f is the total payment made for this year so far.\n", yearToDatePaymentTotal);
-        System.out.printf("$%.2f is the total net for this year so far.\n", yearToDateTotal);
+        System.out.printf("%s$%.2f%s is the total deposit for this year so far.\n",GREEN, yearToDateDepositTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for this year so far.\n",RED, yearToDatePaymentTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total net for this year so far.\n",color, yearToDateTotal,RESET);
         System.out.println(border);
     }
 
@@ -524,10 +553,11 @@ public class AccountingApp {
                 monthTotal += transaction.total();
             }
         }
+        String color = monthTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("$%.2f is the total deposit for this month so far.\n", monthDepositTotal);
-        System.out.printf("$%.2f is the total payment made for this month so far.\n", monthPaymentTotal);
-        System.out.printf("$%.2f is the total net for this month so far.\n", monthTotal);
+        System.out.printf("%s$%.2f%s is the total deposit for this month so far.\n",GREEN, monthDepositTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for this month so far.\n",RED, monthPaymentTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total net for this month so far.\n",color, monthTotal,RESET);
         System.out.println(border);
     }
 
@@ -547,9 +577,10 @@ public class AccountingApp {
                 totalAmount += transaction.getAmount();
             }
         }
+        String color = totalAmount >= 0 ? GREEN : RED;
         System.out.println(border);
         System.out.printf("Results found: %d\n", resultCount);
-        System.out.printf("Total: $%.2f\n", totalAmount);
+        System.out.printf("Total: %s$%.2f%s\n",color, totalAmount,RESET);
         System.out.println(border);
     }
 
@@ -682,10 +713,11 @@ public class AccountingApp {
                 resultCount++;
             }
         }
-        System.out.println("===========================================================================================================================================");
+        String color = totalAmount >= 0 ? GREEN : RED;
+        System.out.println(border);
         System.out.printf("Results found: %d\n", resultCount);
-        System.out.printf("Total: $%.2f\n", totalAmount);
-        System.out.println("===========================================================================================================================================");
+        System.out.printf("Total: %s$%.2f%s\n",color, totalAmount,RESET);
+        System.out.println(border);
     }
 
     private static boolean isUsePartialMatch() {
