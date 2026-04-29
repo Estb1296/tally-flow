@@ -32,12 +32,14 @@ public class AccountingApp {
         boolean isRunning = true;
         while (isRunning) {
             System.out.println("How can we assist you today? Please pick and enter the numbers associated with each menu item.");
+            System.out.println(border);
             System.out.println("""
-                    (1)AddDepositScreen
-                    (2)MakePaymentScreen
-                    (3)LedgerScreen
-                    (4)ExitApp
+                    (1) AddDeposit
+                    (2) Make Payment
+                    (3) Ledger
+                    (4) Exit
                     """);
+            System.out.println(border);
             char choice = input.next().charAt(0);
             switch (choice) {
                 case '1' -> runAddDepositScreen();
@@ -69,13 +71,15 @@ public class AccountingApp {
         while (isRunning) {
             System.out.println("You are accessing your ledger now");
             System.out.println("Pick from the following choices by entering the number beside the choices.");
+            System.out.println(border);
             System.out.println("""
-                    (1)DisplayAllEntriesScreen
-                    (2)DepositsScreen
-                    (3)PaymentsScreen
-                    (4)ReportsScreen
-                    (5)Go Back To The HomeScreen
+                    (1) ALL
+                    (2) Deposits
+                    (3) Payments
+                    (4) Reports
+                    (5) Back
                     """);
+            System.out.println(border);
             char choice = input.next().charAt(0);
             switch (choice) {
                 case '1' -> displayAllEntriesScreen(ledger);
@@ -92,15 +96,17 @@ public class AccountingApp {
         System.out.println("this is the reports screen");
         boolean isRunning = true;
         while (isRunning) {
+            System.out.println(border);
             System.out.println("""
-                    (1)MonthToDateScreen
-                    (2)PreviousMonthScreen
-                    (3)YearToDateScreen
-                    (4)PreviousYearScreen
-                    (5)SearchByVendorScreen
-                    (6)CustomSearchScreen (bonus search by all the listed fields at once but they are all optional)
-                    (7)goBackToLedger
+                    (1) Month To Date
+                    (2) Previous Month
+                    (3) Year To Date
+                    (4) Previous Year
+                    (5) Search By Vendor
+                    (6) Custom Search
+                    (7) Back
                     """);
+            System.out.println(border);
             char choice = input.next().charAt(0);
             switch (choice) {
                 case '1' -> monthToDateScreen(ledger);
