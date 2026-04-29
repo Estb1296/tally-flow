@@ -622,12 +622,13 @@ public class AccountingApp {
                 maxAmount = getValidAmount("Enter maximum amount: ");
             }
         }
-        boolean usePartialMatch = isUsePartialMatch();
+        boolean usePartialMatch = isUsePartialMatch();//isUsePartialMatch returns a boolean based on the user input
         printStandaloneTitle("Transactions", 96, 146);
         for (Transactions transaction : ledger) {
             boolean matches = true;
 
             // Check Vendor filter
+            // If Partial Search is applied it can search for the start of a vendor
             if (!vendorFilter.isEmpty()) {
                 if (usePartialMatch) {
                     if (!transaction.getVendor().toLowerCase().contains(vendorFilter.toLowerCase())) {
@@ -640,6 +641,7 @@ public class AccountingApp {
                 }
             }
             // Check description filter
+            // If Partial Search is applied it can search for the start of a description
             if (!descriptionFilter.isEmpty()) {
                 if (usePartialMatch) {
                     if (!transaction.getDescription().toLowerCase().contains(descriptionFilter.toLowerCase())) {
