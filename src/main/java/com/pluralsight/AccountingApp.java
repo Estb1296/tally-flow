@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 import static java.lang.String.format;
 
 public class AccountingApp {
@@ -16,6 +17,7 @@ public class AccountingApp {
     public static final String GREEN = "\u001B[32m";
     public static final String YELLOW = "\u001B[33m";
     public static final String CYAN = "\u001B[36m";
+
 
     public static void main(String[] args) {
         System.out.println("Good to go");
@@ -79,7 +81,7 @@ public class AccountingApp {
                 case 3 -> paymentsScreen(ledger);
                 case 4 -> runReportsScreen(ledger);
                 case 5 -> isRunning = false;
-                default-> System.out.println("Invalid input please try again.\n");
+                default -> System.out.println("Invalid input please try again.\n");
             }
         }
     }
@@ -170,13 +172,13 @@ public class AccountingApp {
         }
         sortByMostRecent(ledger);
 
-        printStandaloneTitle("All Entries",96,146);
+        printStandaloneTitle("All Entries", 96, 146);
         for (Transactions transaction : ledger) {
             String look = getLook(transaction);
 
             System.out.print(look); // Use print() because %n already adds a newline
         }
-        }
+    }
 
     private static String getLook(Transactions transaction) {
         String color = transaction.isDeposit() ? GREEN : RED;
@@ -214,9 +216,15 @@ public class AccountingApp {
     public static void addDepositToLedger(ArrayList<Transactions> ledger) {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
             Transactions lastDeposit = ledger.get(ledger.size() - 1);
-            String line = format("%s|%s|%s|%s|%.2f%n", lastDeposit.getDate(), lastDeposit.getTime().format(timeFormatter), lastDeposit.getDescription(), lastDeposit.getVendor(), lastDeposit.getAmount());
+            String line = format("%s|%s|%s|%s|%.2f%n",
+                    lastDeposit.getDate().format(dateFormatter),
+                    lastDeposit.getTime().format(timeFormatter),
+                    lastDeposit.getDescription(),
+                    lastDeposit.getVendor(),
+                    lastDeposit.getAmount());
             writer.write(line);
             writer.close();
 
@@ -281,10 +289,10 @@ public class AccountingApp {
             try {
                 System.out.println(prompt);
                 System.out.println("(Format: yyyy-MM-dd)");
-                String userInput=input.nextLine().trim();
-                if(userInput.isEmpty()) {
+                String userInput = input.nextLine().trim();
+                if (userInput.isEmpty()) {
                     date = LocalDate.now();
-                }else{
+                } else {
                     date = LocalDate.parse(userInput, dateFormatter);
                 }
                 validDate = true;
@@ -294,6 +302,7 @@ public class AccountingApp {
         }
         return date;
     }
+
     public static double getValidDeposit(String prompt) {
         boolean validAmount = false;
         double amount = 0;
@@ -320,6 +329,7 @@ public class AccountingApp {
 
         return amount;
     }
+
     public static double getValidPayment(String prompt) {
         boolean validAmount = false;
         double amount = 0;
@@ -346,6 +356,7 @@ public class AccountingApp {
 
         return amount;
     }
+
     public static double getValidAmount(String prompt) {
         boolean validAmount = false;
         double amount = 0;
@@ -365,6 +376,7 @@ public class AccountingApp {
 
         return amount;
     }
+
     public static String getValidString(String prompt) {//clear buffer
         String userInput = "";
         boolean validInput = false;
@@ -392,7 +404,7 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isDeposit()) {
-               String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
             }
         }
@@ -402,19 +414,19 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isPayment()) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
             }
         }
     }
 
     public static void depositsScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Deposits",96,146);
+        printStandaloneTitle("Deposits", 96, 146);
         displayDeposits(ledger);
     }
 
     public static void paymentsScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Payments",96,146);
+        printStandaloneTitle("Payments", 96, 146);
         displayPayments(ledger);
     }
 
@@ -425,7 +437,7 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isFromPreviousYear()) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
                     previousYearDepositTotal += transaction.total();
@@ -450,7 +462,7 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isFromPreviousMonth()) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
                     previousMonthDepositTotal += transaction.total();  // Use getAmount()
@@ -475,7 +487,7 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isYearToDate()) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
                     yearToDateDepositTotal += transaction.total();  // Use getAmount()
@@ -501,7 +513,7 @@ public class AccountingApp {
         sortByMostRecent(ledger);
         for (Transactions transaction : ledger) {
             if (transaction.isMonthToDate()) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
                     monthDepositTotal += transaction.total();
@@ -521,15 +533,15 @@ public class AccountingApp {
 
     public static void searchByVendor(ArrayList<Transactions> ledger) {
         input.nextLine();
-        int resultCount=0;
-        double totalAmount=0;
+        int resultCount = 0;
+        double totalAmount = 0;
         System.out.println("Please enter the name of the vendor you want transactions pulled up from");
         String vendor = input.nextLine().trim();
         sortByMostRecent(ledger);
-        printStandaloneTitle("Transactions",96,146);
+        printStandaloneTitle("Transactions", 96, 146);
         for (Transactions transaction : ledger) {
             if (transaction.getVendor().equalsIgnoreCase(vendor)) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 resultCount++;
                 totalAmount += transaction.getAmount();
@@ -555,22 +567,22 @@ public class AccountingApp {
     }
 
     public static void previousMonthScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Previous Month Transactions",96,146);
+        printStandaloneTitle("Previous Month Transactions", 96, 146);
         previousMonthSearch(ledger);
     }
 
     public static void monthToDateScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Month To Date Transactions",96,146);
+        printStandaloneTitle("Month To Date Transactions", 96, 146);
         monthToDate(ledger);
     }
 
     public static void yearToDateScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Year To Date Transactions",96,146);
+        printStandaloneTitle("Year To Date Transactions", 96, 146);
         yearToDate(ledger);
     }
 
     public static void previousYearScreen(ArrayList<Transactions> ledger) {
-        printStandaloneTitle("Previous Year Transactions",96,146);
+        printStandaloneTitle("Previous Year Transactions", 96, 146);
         previousYearSearch(ledger);
     }
 
@@ -596,7 +608,7 @@ public class AccountingApp {
         if (dateRangeChoice.equalsIgnoreCase("yes")) {
             startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
             endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
-            while(endDate.isBefore(startDate)){
+            while (endDate.isBefore(startDate)) {
                 System.out.println("The end date can not be before the start date");
                 endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
             }
@@ -605,13 +617,13 @@ public class AccountingApp {
         if (amountRangeChoice.equalsIgnoreCase("yes")) {
             minAmount = getValidAmount("Enter minimum amount: ");
             maxAmount = getValidAmount("Enter maximum amount: ");
-            while(maxAmount<minAmount){
-            System.out.println("The maximum amount has to be greater than the minimum");
-            maxAmount = getValidAmount("Enter maximum amount: ");
+            while (maxAmount < minAmount) {
+                System.out.println("The maximum amount has to be greater than the minimum");
+                maxAmount = getValidAmount("Enter maximum amount: ");
             }
         }
         boolean usePartialMatch = isUsePartialMatch();
-        printStandaloneTitle("Transactions",96,146);
+        printStandaloneTitle("Transactions", 96, 146);
         for (Transactions transaction : ledger) {
             boolean matches = true;
 
@@ -662,7 +674,7 @@ public class AccountingApp {
                 matches = false;
             }
             if (matches) {
-                String look=getLook(transaction);
+                String look = getLook(transaction);
                 System.out.println(look);
                 totalAmount += transaction.getAmount();
                 resultCount++;
@@ -692,7 +704,8 @@ public class AccountingApp {
     public static void customSearchScreen(ArrayList<Transactions> ledger) {
         customSearch(ledger);
     }
-    public static void printStandaloneTitle(String title,int boxWidth, int screenWidth) {
+
+    public static void printStandaloneTitle(String title, int boxWidth, int screenWidth) {
         // 1. Top Border
         int leftMargin = (screenWidth - boxWidth) / 2;
         String margin = " ".repeat(Math.max(0, leftMargin));
@@ -707,6 +720,7 @@ public class AccountingApp {
         // 4. Bottom border (with margin)
         System.out.println(margin + "╚" + "═".repeat(boxWidth - 2) + "╝");
     }
+
     public static String center(String text, int width) {
         if (text == null || text.length() >= width) {
             return text; // Return as-is if it's too long
