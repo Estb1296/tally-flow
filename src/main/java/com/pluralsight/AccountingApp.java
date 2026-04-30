@@ -416,6 +416,14 @@ public class AccountingApp {
         displayPayments(ledger);
     }
 
+    /**
+     * Searches the ledger for all transactions from the previous year.
+     * Displays matching transactions sorted by most recent and provides
+     * summary totals for deposits, payments, and net amount.
+     * Deposits are displayed in green, payments in red.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
     public static void previousYearSearch(ArrayList<Transaction> ledger) {
         double previousYearTotal = 0;
         double previousYearDepositTotal = 0;
@@ -442,6 +450,14 @@ public class AccountingApp {
         System.out.println(border);
     }
 
+    /**
+     * Searches the ledger for all transactions from the previous month.
+     * Displays matching transactions sorted by most recent and provides
+     * summary totals for deposits, payments, and net amount.
+     * Deposits are displayed in green, payments in red.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
     public static void previousMonthSearch(ArrayList<Transaction> ledger) {
         double previousMonthTotal = 0;
         double previousMonthDepositTotal = 0;
@@ -452,12 +468,12 @@ public class AccountingApp {
                 String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
-                    previousMonthDepositTotal += transaction.total();  // Use getAmount()
+                    previousMonthDepositTotal += transaction.total();
                 }
                 if (transaction.isPayment()) {
-                    previousMonthPaymentTotal += transaction.total();  // Use getAmount()
+                    previousMonthPaymentTotal += transaction.total();
                 }
-                previousMonthTotal += transaction.total();  // Use getAmount()
+                previousMonthTotal += transaction.total();
             }
         }
         String color = previousMonthTotal >= 0 ? GREEN : RED;
@@ -468,6 +484,14 @@ public class AccountingApp {
         System.out.println(border);
     }
 
+    /**
+     * Searches the ledger for all transactions from the current year to date.
+     * Displays matching transactions sorted by most recent and provides
+     * summary totals for deposits, payments, and net amount.
+     * Deposits are displayed in green, payments in red.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
     public static void yearToDate(ArrayList<Transaction> ledger) {
         double yearToDateTotal = 0;
         double yearToDateDepositTotal = 0;
@@ -478,12 +502,11 @@ public class AccountingApp {
                 String look = getLook(transaction);
                 System.out.println(look);
                 if (transaction.isDeposit()) {
-                    yearToDateDepositTotal += transaction.total();  // Use getAmount()
+                    yearToDateDepositTotal += transaction.total();
                 }
                 if (transaction.isPayment()) {
-                    yearToDatePaymentTotal += transaction.total();  // Use getAmount()
+                    yearToDatePaymentTotal += transaction.total();
                 }
-                //yearToDateTotal += transaction.getAmount();
                 yearToDateTotal += transaction.total();
             }
         }
@@ -495,6 +518,14 @@ public class AccountingApp {
         System.out.println(border);
     }
 
+    /**
+     * Searches the ledger for all transactions from the current month to date.
+     * Displays matching transactions sorted by most recent and provides
+     * summary totals for deposits, payments, and net amount.
+     * Deposits are displayed in green, payments in red.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
     public static void monthToDate(ArrayList<Transaction> ledger) {
         double monthTotal = 0;
         double monthDepositTotal = 0;
@@ -521,6 +552,15 @@ public class AccountingApp {
         System.out.println(border);
     }
 
+    /**
+     * Searches the ledger for all transactions from a specific vendor.
+     * User is prompted to enter the vendor name. Performs exact case-insensitive matching.
+     * Displays matching transactions sorted by most recent and provides
+     * total amount and count of matching transactions.
+     * Total amount is displayed in green for positive totals, red for negative.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
     public static void searchByVendor(ArrayList<Transaction> ledger) {
         input.nextLine();
         int resultCount = 0;
@@ -581,121 +621,13 @@ public class AccountingApp {
         searchByVendor(ledger);
     }
 
-    public static void customSearch(ArrayList<Transaction> ledger) {
-        sortByMostRecent(ledger);
-        input.nextLine(); //clean buffer
-        String vendorFilter = getOptionalString("What is the vendor name (or press Enter to skip): ");
-        String descriptionFilter = getOptionalString("What is the description for the transaction(or press Enter to skip): ");
-        String dateRangeChoice = getOptionalString("Search by date range? (yes/no, or press Enter to skip): ");
-        String typeFilter = getOptionalString("Filter by type (deposit/payment/all, or press Enter for all): ");
-        String amountRangeChoice = getOptionalString("Search by amount range? (yes/no, or press Enter to skip): ");
-        double totalAmount = 0;
-        int resultCount = 0;
-        LocalDate startDate = null;
-        LocalDate endDate = null;
-        double minAmount = Double.NEGATIVE_INFINITY;
-        double maxAmount = Double.POSITIVE_INFINITY;
-        // Get date range if requested
-        if (dateRangeChoice.equalsIgnoreCase("yes")) {
-            startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
-            endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
-            while (endDate.isBefore(startDate)) {
-                System.out.println("The end date can not be before the start date");
-                startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
-                endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
-            }
-        }
-        // Get amount range if requested
-        if (amountRangeChoice.equalsIgnoreCase("yes")) {
-            minAmount = getValidAmount("Enter minimum amount: ");
-            maxAmount = getValidAmount("Enter maximum amount: ");
-            while (maxAmount < minAmount) {
-                System.out.println("The maximum amount has to be greater than the minimum");
-                maxAmount = getValidAmount("Enter maximum amount: ");
-            }
-            minAmount=Math.abs(minAmount);
-            maxAmount=Math.abs(maxAmount);
-        }
-        boolean usePartialMatch = isUsePartialMatch();//isUsePartialMatch returns a boolean based on the user input
-        printStandaloneTitle("Transactions", 96, 146);
-        for (Transaction transaction : ledger) {
-            boolean matches = true;
-
-            //Check Vendor filter
-            // If Partial Search is applied it can search for the start of a vendor
-
-            if (!vendorFilter.isEmpty()) {
-                if (usePartialMatch) {
-                    // Check BOTH directions
-                    boolean searchContainsVendor = vendorFilter.toLowerCase()
-                            .contains(transaction.getVendor().toLowerCase());
-                    boolean vendorContainsSearch = transaction.getVendor().toLowerCase()
-                            .contains(vendorFilter.toLowerCase());
-
-                    if (!searchContainsVendor && !vendorContainsSearch) {
-                        matches = false;
-                    }
-                } else {
-                    if (!transaction.getVendor().trim()
-                            .equalsIgnoreCase(vendorFilter.trim())) {
-                        matches = false;
-                    }
-                }
-            }
-            // Check description filter
-            if (!descriptionFilter.isEmpty()) {
-                if (usePartialMatch) {
-                    boolean searchContainsDesc = descriptionFilter.toLowerCase()
-                            .contains(transaction.getDescription().toLowerCase());
-                    boolean descContainsSearch = transaction.getDescription().toLowerCase()
-                            .contains(descriptionFilter.toLowerCase());
-
-                    if (!searchContainsDesc && !descContainsSearch) {
-                        matches = false;
-                    }
-                } else {
-                    if (!transaction.getDescription().trim()
-                            .equalsIgnoreCase(descriptionFilter.trim())) {
-                        matches = false;
-                    }
-                }
-            }
-            // Check date range filter
-            if (startDate != null && endDate != null) {
-                if (transaction.getDate().isBefore(startDate) ||
-                        transaction.getDate().isAfter(endDate)) {
-                    matches = false;
-                }
-            }
-
-            // Check type filter
-            if (!typeFilter.isEmpty() && !typeFilter.equalsIgnoreCase("all")) {
-                if (typeFilter.equalsIgnoreCase("deposit") && !transaction.isDeposit()) {
-                    matches = false;
-                }
-                if (typeFilter.equalsIgnoreCase("payment") && !transaction.isPayment()) {
-                    matches = false;
-                }
-            }
-
-            // Check amount range filter
-            if (Math.abs(transaction.getAmount()) < minAmount || Math.abs(transaction.getAmount()) > maxAmount) {
-                matches = false;
-            }
-            if (matches) {
-                String look = getLook(transaction);
-                System.out.println(look);
-                totalAmount += transaction.getAmount();
-                resultCount++;
-            }
-        }
-        String color = totalAmount >= 0 ? GREEN : RED;
-        System.out.println(border);
-        System.out.printf("Results found: %d\n", resultCount);
-        System.out.printf("Total: %s$%.2f%s\n",color, totalAmount,RESET);
-        System.out.println(border);
-    }
-
+    /**
+     * Prompts the user to decide whether to use partial matching for search filters.
+     * Accepts "yes" or "no" as valid input and retries on invalid input.
+     * Partial matching allows substring searches in both directions (e.g., "Ama" finds "Amazon").
+     *
+     * @return true if the user selects partial matching, false for exact matching
+     */
     private static boolean isUsePartialMatch() {
         System.out.println("Do you want partial matching? (yes/no)");
         String choice = input.nextLine().trim();
@@ -706,11 +638,227 @@ public class AccountingApp {
         return choice.equalsIgnoreCase("yes");
     }
 
+    /**
+     * Prompts the user for optional string input and returns the trimmed result.
+     * Input can be empty, in which case an empty string is returned.
+     * Used throughout the application for flexible user input that may be skipped.
+     *
+     * @param prompt The prompt message to display to the user
+     * @return The user's input trimmed of leading/trailing whitespace, or empty string if user presses Enter
+     */
     public static String getOptionalString(String prompt) {
         System.out.println(prompt);
         return input.nextLine().trim();
     }
 
+    /**
+     * Checks if a vendor filter matches the transaction using exact or partial matching.
+     *
+     * @param vendorFilter The vendor name to search for
+     * @param transaction The transaction to check
+     * @param usePartialMatch Whether to use partial matching (true) or exact matching (false)
+     * @return true if the transaction matches the vendor filter, false otherwise
+     */
+    private static boolean vendorFilterMatches(String vendorFilter, Transaction transaction, boolean usePartialMatch) {
+        if (vendorFilter.isEmpty()) {
+            return true;
+        }
+
+        if (usePartialMatch) {
+            boolean searchContainsVendor = vendorFilter.toLowerCase()
+                    .contains(transaction.getVendor().toLowerCase());
+            boolean vendorContainsSearch = transaction.getVendor().toLowerCase()
+                    .contains(vendorFilter.toLowerCase());
+            return searchContainsVendor || vendorContainsSearch;
+        } else {
+            return transaction.getVendor().trim().equalsIgnoreCase(vendorFilter.trim());
+        }
+    }
+
+    /**
+     * Checks if a description filter matches the transaction using exact or partial matching.
+     *
+     * @param descriptionFilter The description to search for
+     * @param transaction The transaction to check
+     * @param usePartialMatch Whether to use partial matching (true) or exact matching (false)
+     * @return true if the transaction matches the description filter, false otherwise
+     */
+    private static boolean descriptionFilterMatches(String descriptionFilter, Transaction transaction, boolean usePartialMatch) {
+        if (descriptionFilter.isEmpty()) {
+            return true;
+        }
+
+        if (usePartialMatch) {
+            boolean searchContainsDesc = descriptionFilter.toLowerCase()
+                    .contains(transaction.getDescription().toLowerCase());
+            boolean descContainsSearch = transaction.getDescription().toLowerCase()
+                    .contains(descriptionFilter.toLowerCase());
+            return searchContainsDesc || descContainsSearch;
+        } else {
+            return transaction.getDescription().trim().equalsIgnoreCase(descriptionFilter.trim());
+        }
+    }
+
+    /**
+     * Checks if a transaction's date falls within the specified date range.
+     *
+     * @param transaction The transaction to check
+     * @param startDate The start of the date range (null means no lower bound)
+     * @param endDate The end of the date range (null means no upper bound)
+     * @return true if the transaction date is within range, false otherwise
+     */
+    private static boolean dateFilterMatches(Transaction transaction, LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            return true;
+        }
+
+        return !transaction.getDate().isBefore(startDate) && !transaction.getDate().isAfter(endDate);
+    }
+
+    /**
+     * Checks if a transaction matches the specified type filter (deposit, payment, or all).
+     *
+     * @param typeFilter The type filter to apply ("deposit", "payment", or "all")
+     * @param transaction The transaction to check
+     * @return true if the transaction matches the type filter, false otherwise
+     */
+    private static boolean typeFilterMatches(String typeFilter, Transaction transaction) {
+        if (typeFilter.isEmpty() || typeFilter.equalsIgnoreCase("all")) {
+            return true;
+        }
+
+        if (typeFilter.equalsIgnoreCase("deposit")) {
+            return transaction.isDeposit();
+        }
+        if (typeFilter.equalsIgnoreCase("payment")) {
+            return transaction.isPayment();
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if a transaction's amount falls within the specified range.
+     * Uses absolute values to handle both deposits and payments uniformly.
+     *
+     * @param transaction The transaction to check
+     * @param minAmount The minimum amount (inclusive)
+     * @param maxAmount The maximum amount (inclusive)
+     * @return true if the transaction amount is within range, false otherwise
+     */
+    private static boolean amountFilterMatches(Transaction transaction, double minAmount, double maxAmount) {
+        double absoluteAmount = Math.abs(transaction.getAmount());
+        return absoluteAmount >= minAmount && absoluteAmount <= maxAmount;
+    }
+
+    /**
+     * Prompts the user for all search filter criteria and validates input.
+     * Returns an array containing all filter values in order:
+     * [0] vendorFilter, [1] descriptionFilter, [2] typeFilter,
+     * [3] startDate, [4] endDate, [5] minAmount, [6] maxAmount, [7] usePartialMatch
+     *
+     * @return An Object array containing all user-provided search criteria
+     */
+    private static Object[] gatherSearchFilters() {
+        String vendorFilter = getOptionalString("What is the vendor name (or press Enter to skip): ");
+        String descriptionFilter = getOptionalString("What is the description for the transaction(or press Enter to skip): ");
+        String dateRangeChoice = getOptionalString("Search by date range? (yes/no, or press Enter to skip): ");
+        String typeFilter = getOptionalString("Filter by type (deposit/payment/all, or press Enter for all): ");
+        String amountRangeChoice = getOptionalString("Search by amount range? (yes/no, or press Enter to skip): ");
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        double minAmount = Double.NEGATIVE_INFINITY;
+        double maxAmount = Double.POSITIVE_INFINITY;
+
+        // Get date range if requested
+        if (dateRangeChoice.equalsIgnoreCase("yes")) {
+            startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
+            endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
+            while (endDate.isBefore(startDate)) {
+                System.out.println("The end date can not be before the start date");
+                startDate = getValidDate("Enter start date (yyyy-MM-dd): ");
+                endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
+            }
+        }
+
+        // Get amount range if requested
+        if (amountRangeChoice.equalsIgnoreCase("yes")) {
+            minAmount = getValidAmount("Enter minimum amount: ");
+            maxAmount = getValidAmount("Enter maximum amount: ");
+            while (maxAmount < minAmount) {
+                System.out.println("The maximum amount has to be greater than the minimum");
+                maxAmount = getValidAmount("Enter maximum amount: ");
+            }
+            minAmount = Math.abs(minAmount);
+            maxAmount = Math.abs(maxAmount);
+        }
+
+        boolean usePartialMatch = isUsePartialMatch();
+
+        return new Object[]{vendorFilter, descriptionFilter, typeFilter, startDate, endDate, minAmount, maxAmount, usePartialMatch};
+    }
+
+    /**
+     * Displays search results summary with total amount and result count.
+     *
+     * @param totalAmount The sum of all matching transaction amounts
+     * @param resultCount The number of matching transactions
+     */
+    private static void displaySearchResults(double totalAmount, int resultCount) {
+        String color = totalAmount >= 0 ? GREEN : RED;
+        System.out.println(border);
+        System.out.printf("Results found: %d\n", resultCount);
+        System.out.printf("Total: %s$%.2f%s\n", color, totalAmount, RESET);
+        System.out.println(border);
+    }
+    /**
+     * Performs an advanced search on the ledger with multiple filter options.
+     * Users can filter by vendor, description, date range, transaction type, and amount range.
+     * Supports both exact and partial matching for text-based filters.
+     * Uses absolute values for amount comparison to handle both deposits and payments uniformly.
+     *
+     * @param ledger The ArrayList of transactions to search through
+     */
+    public static void customSearch(ArrayList<Transaction> ledger) {
+        sortByMostRecent(ledger);
+        input.nextLine(); // clean buffer
+
+        // Gather all search criteria from user
+        Object[] filters = gatherSearchFilters();
+        String vendorFilter = (String) filters[0];
+        String descriptionFilter = (String) filters[1];
+        String typeFilter = (String) filters[2];
+        LocalDate startDate = (LocalDate) filters[3];
+        LocalDate endDate = (LocalDate) filters[4];
+        double minAmount = (double) filters[5];
+        double maxAmount = (double) filters[6];
+        boolean usePartialMatch = (boolean) filters[7];
+
+        double totalAmount = 0;
+        int resultCount = 0;
+
+        printStandaloneTitle("Transactions", 96, 146);
+
+        // Apply all filters to each transaction
+        for (Transaction transaction : ledger) {
+            boolean matches = vendorFilterMatches(vendorFilter, transaction, usePartialMatch)
+                    && descriptionFilterMatches(descriptionFilter, transaction, usePartialMatch)
+                    && dateFilterMatches(transaction, startDate, endDate)
+                    && typeFilterMatches(typeFilter, transaction)
+                    && amountFilterMatches(transaction, minAmount, maxAmount);
+
+            if (matches) {
+                String look = getLook(transaction);
+                System.out.println(look);
+                totalAmount += transaction.getAmount();
+                resultCount++;
+            }
+        }
+
+        // Display summary of results
+        displaySearchResults(totalAmount, resultCount);
+    }
     public static void customSearchScreen(ArrayList<Transaction> ledger) {
         customSearch(ledger);
     }
