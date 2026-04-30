@@ -43,7 +43,7 @@ public class AccountingApp {
             char choice = input.next().charAt(0);
             switch (choice) {
                 case '1' -> runAddDepositScreen();
-                case '2'-> runMakePaymentScreen();
+                case '2' -> runMakePaymentScreen();
                 case '3' -> runLedgerScreen();
                 case '4' -> isRunning = exitApp();
                 default -> System.out.println("Invalid input.Please try again\n");
@@ -146,7 +146,7 @@ public class AccountingApp {
                     ledger.add(new Transaction(date, time, description, vendor, amount));
 
                 } catch (DateTimeParseException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                   // System.out.println("Skipping header: " + line);
+                    // System.out.println("Skipping header: " + line);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -184,22 +184,22 @@ public class AccountingApp {
             return;
         }
         sortByMostRecent(ledger);
-        double totalEntries=0;
-        int entriesCount=0;
+        double totalEntries = 0;
+        int entriesCount = 0;
 
         printStandaloneTitle("All Entries", 96, 146);
         for (Transaction transaction : ledger) {
             String look = getLook(transaction);
 
             System.out.print(look);
-            totalEntries+=transaction.total();
+            totalEntries += transaction.total();
             entriesCount++;
             // Use print() because %n already adds a newline
         }
         String color = totalEntries >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total of all the entries made onn this ledger. \n",color,totalEntries,RESET);
-        System.out.printf("%d is the number of entries made on this ledger.\n",entriesCount);
+        System.out.printf("%s$%.2f%s is the total of all the entries made onn this ledger. \n", color, totalEntries, RESET);
+        System.out.printf("%d is the number of entries made on this ledger.\n", entriesCount);
         System.out.println(border);
     }
 
@@ -226,7 +226,7 @@ public class AccountingApp {
         double depositAmount = Math.abs(getValidAmount("How much do you want to deposit?"));
         System.out.printf("%.2f is the amount you have deposited into your account.\n", depositAmount);
 
-        String vendor = getValidString("What is the source of funds of the deposit?");
+        String vendor = getValidString("What is the source of funds of the deposit?(Vendor)");
 
         String description = getValidString("What is the description of said deposit?");
 
@@ -266,7 +266,7 @@ public class AccountingApp {
 
     public static void promptUserForPaymentInfo() {
 
-        double paymentAmount = Math.abs(getValidAmount("How much was the payment?"))*-1;
+        double paymentAmount = Math.abs(getValidAmount("How much was the payment?")) * -1;
         System.out.printf("%.2f is the amount you have paid from your account\n", paymentAmount);
         String vendor = getValidString("What is the recipient of the payment?");
         String description = getValidString("What is the description of said payment?");
@@ -371,37 +371,37 @@ public class AccountingApp {
 
     public static void displayDeposits() {
         sortByMostRecent(ledger);
-        double depositTotal=0;
-        int depositCount=0;
+        double depositTotal = 0;
+        int depositCount = 0;
         for (Transaction transaction : ledger) {
             if (transaction.isDeposit()) {
                 String look = getLook(transaction);
                 System.out.println(look);
-                depositTotal+= transaction.total();
+                depositTotal += transaction.total();
                 depositCount++;
             }
         }
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total ($)amount of deposits made on this ledger.\n",GREEN,depositTotal,RESET);
-        System.out.printf("%d is the total count of deposits made on the ledger.\n",depositCount);
+        System.out.printf("%s$%.2f%s is the total ($)amount of deposits made on this ledger.\n", GREEN, depositTotal, RESET);
+        System.out.printf("%d is the total count of deposits made on the ledger.\n", depositCount);
         System.out.println(border);
     }
 
     public static void displayPayments() {
         sortByMostRecent(ledger);
-        double paymentTotal=0;
-        int paymentCount=0;
+        double paymentTotal = 0;
+        int paymentCount = 0;
         for (Transaction transaction : ledger) {
             if (transaction.isPayment()) {
                 String look = getLook(transaction);
                 System.out.println(look);
-                paymentTotal+= transaction.total();
+                paymentTotal += transaction.total();
                 paymentCount++;
             }
         }
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total ($)amount of payments made on this ledger.\n",RED,paymentTotal,RESET);
-        System.out.printf("%d is the total count of payments made on the ledger.\n",paymentCount);
+        System.out.printf("%s$%.2f%s is the total ($)amount of payments made on this ledger.\n", RED, paymentTotal, RESET);
+        System.out.printf("%d is the total count of payments made on the ledger.\n", paymentCount);
         System.out.println(border);
     }
 
@@ -443,9 +443,9 @@ public class AccountingApp {
         }
         String color = previousYearTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total deposit for the previous year.\n",GREEN, previousYearDepositTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total payment made for the previous year.\n",RED, previousYearPaymentTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total net for the previous year.\n",color, previousYearTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total deposit for the previous year.\n", GREEN, previousYearDepositTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for the previous year.\n", RED, previousYearPaymentTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total net for the previous year.\n", color, previousYearTotal, RESET);
         System.out.println(border);
     }
 
@@ -477,9 +477,9 @@ public class AccountingApp {
         }
         String color = previousMonthTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total deposit for the previous month.\n",GREEN, previousMonthDepositTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total payment made for the previous month.\n",RED, previousMonthPaymentTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total net for the previous month.\n",color, previousMonthTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total deposit for the previous month.\n", GREEN, previousMonthDepositTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for the previous month.\n", RED, previousMonthPaymentTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total net for the previous month.\n", color, previousMonthTotal, RESET);
         System.out.println(border);
     }
 
@@ -511,9 +511,9 @@ public class AccountingApp {
         }
         String color = yearToDateTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total deposit for this year so far.\n",GREEN, yearToDateDepositTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total payment made for this year so far.\n",RED, yearToDatePaymentTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total net for this year so far.\n",color, yearToDateTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total deposit for this year so far.\n", GREEN, yearToDateDepositTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for this year so far.\n", RED, yearToDatePaymentTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total net for this year so far.\n", color, yearToDateTotal, RESET);
         System.out.println(border);
     }
 
@@ -545,9 +545,9 @@ public class AccountingApp {
         }
         String color = monthTotal >= 0 ? GREEN : RED;
         System.out.println(border);
-        System.out.printf("%s$%.2f%s is the total deposit for this month so far.\n",GREEN, monthDepositTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total payment made for this month so far.\n",RED, monthPaymentTotal,RESET);
-        System.out.printf("%s$%.2f%s is the total net for this month so far.\n",color, monthTotal,RESET);
+        System.out.printf("%s$%.2f%s is the total deposit for this month so far.\n", GREEN, monthDepositTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total payment made for this month so far.\n", RED, monthPaymentTotal, RESET);
+        System.out.printf("%s$%.2f%s is the total net for this month so far.\n", color, monthTotal, RESET);
         System.out.println(border);
     }
 
@@ -571,7 +571,7 @@ public class AccountingApp {
         String vendorInput = vendor.trim().toLowerCase();
         for (Transaction transaction : ledger) {
             String vendorValue = transaction.getVendor().trim().toLowerCase();
-            if (vendorInput.contains(vendorValue)||vendorValue.contains(vendorInput)) {
+            if (vendorInput.contains(vendorValue) || vendorValue.contains(vendorInput)) {
                 String look = getLook(transaction);
                 System.out.println(look);
                 resultCount++;
@@ -581,7 +581,7 @@ public class AccountingApp {
         String color = totalAmount >= 0 ? GREEN : RED;
         System.out.println(border);
         System.out.printf("Results found: %d\n", resultCount);
-        System.out.printf("Total: %s$%.2f%s\n",color, totalAmount,RESET);
+        System.out.printf("Total: %s$%.2f%s\n", color, totalAmount, RESET);
         System.out.println(border);
     }
 
@@ -655,8 +655,8 @@ public class AccountingApp {
     /**
      * Checks if a vendor filter matches the transaction using exact or partial matching.
      *
-     * @param vendorFilter The vendor name to search for
-     * @param transaction The transaction to check
+     * @param vendorFilter    The vendor name to search for
+     * @param transaction     The transaction to check
      * @param usePartialMatch Whether to use partial matching (true) or exact matching (false)
      * @return true if the transaction matches the vendor filter, false otherwise
      */
@@ -680,8 +680,8 @@ public class AccountingApp {
      * Checks if a description filter matches the transaction using exact or partial matching.
      *
      * @param descriptionFilter The description to search for
-     * @param transaction The transaction to check
-     * @param usePartialMatch Whether to use partial matching (true) or exact matching (false)
+     * @param transaction       The transaction to check
+     * @param usePartialMatch   Whether to use partial matching (true) or exact matching (false)
      * @return true if the transaction matches the description filter, false otherwise
      */
     private static boolean descriptionFilterMatches(String descriptionFilter, Transaction transaction, boolean usePartialMatch) {
@@ -704,8 +704,8 @@ public class AccountingApp {
      * Checks if a transaction's date falls within the specified date range.
      *
      * @param transaction The transaction to check
-     * @param startDate The start of the date range (null means no lower bound)
-     * @param endDate The end of the date range (null means no upper bound)
+     * @param startDate   The start of the date range (null means no lower bound)
+     * @param endDate     The end of the date range (null means no upper bound)
      * @return true if the transaction date is within range, false otherwise
      */
     private static boolean dateFilterMatches(Transaction transaction, LocalDate startDate, LocalDate endDate) {
@@ -719,7 +719,7 @@ public class AccountingApp {
     /**
      * Checks if a transaction matches the specified type filter (deposit, payment, or all).
      *
-     * @param typeFilter The type filter to apply ("deposit", "payment", or "all")
+     * @param typeFilter  The type filter to apply ("deposit", "payment", or "all")
      * @param transaction The transaction to check
      * @return true if the transaction matches the type filter, false otherwise
      */
@@ -743,8 +743,8 @@ public class AccountingApp {
      * Uses absolute values to handle both deposits and payments uniformly.
      *
      * @param transaction The transaction to check
-     * @param minAmount The minimum amount (inclusive)
-     * @param maxAmount The maximum amount (inclusive)
+     * @param minAmount   The minimum amount (inclusive)
+     * @param maxAmount   The maximum amount (inclusive)
      * @return true if the transaction amount is within range, false otherwise
      */
     private static boolean amountFilterMatches(Transaction transaction, double minAmount, double maxAmount) {
@@ -813,6 +813,7 @@ public class AccountingApp {
         System.out.printf("Total: %s$%.2f%s\n", color, totalAmount, RESET);
         System.out.println(border);
     }
+
     /**
      * Performs an advanced search on the ledger with multiple filter options.
      * Users can filter by vendor, description, date range, transaction type, and amount range.
@@ -860,6 +861,7 @@ public class AccountingApp {
         // Display summary of results
         displaySearchResults(totalAmount, resultCount);
     }
+
     public static void customSearchScreen(ArrayList<Transaction> ledger) {
         customSearch(ledger);
     }
