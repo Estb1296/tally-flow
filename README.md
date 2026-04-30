@@ -171,6 +171,137 @@ Model representing a single ledger entry.
 | 🟡 Yellow | Description and vendor fields |
  
 ---
+## 🧩 Code Walkthrough
+ 
+Here are five key methods from the custom search feature, each explained with the actual code.
+ 
+---
+ 
+### 1. Partial Match Toggle — `isUsePartialMatch()`
+ 
+This method asks the user whether they want flexible (partial) or strict (exact) matching when searching. It loops until a valid `yes` or `no` is entered, so the program never crashes from bad input.
+ 
+```java
+private static boolean isUsePartialMatch() {
+    System.out.println("Do you want partial matching? (yes/no)");
+    String choice = input.nextLine().trim();
+    while (!(choice.equalsIgnoreCase("yes") || choice.equalsIgnoreCase("no"))) {
+        System.out.println("Please enter a valid input.(Yes/NO)");
+        choice = input.nextLine();
+    }
+    return choice.equalsIgnoreCase("yes");
+}
+```
+ 
+**How it works:** The `while` loop keeps prompting until the user types `yes` or `no` (case-insensitive). It returns `true` for partial matching and `false` for exact matching. This boolean gets passed down to the filter methods below.
+ 
+---
+ 
+### 2. Vendor Filter — `vendorFilterMatches()`
+ 
+This method checks whether a transaction's vendor matches the user's search term. It supports both partial and exact matching depending on the user's earlier choice.
+ 
+```java
+private static boolean vendorFilterMatches(String vendorFilter, Transaction transaction, boolean usePartialMatch) {
+    if (vendorFilter.isEmpty()) {
+        return true;
+    }
+ 
+    if (usePartialMatch) {
+        boolean searchContainsVendor = vendorFilter.toLowerCase()
+                .contains(transaction.getVendor().toLowerCase());
+        boolean vendorContainsSearch = transaction.getVendor().toLowerCase()
+                .contains(vendorFilter.toLowerCase());
+        return searchContainsVendor || vendorContainsSearch;
+    } else {
+        return transaction.getVendor().trim().equalsIgnoreCase(vendorFilter.trim());
+    }
+}
+```
+ 
+**How it works:** If the filter is blank, every transaction passes (no filter applied). With partial matching on, it checks both directions — does the search term contain the vendor, or does the vendor contain the search term? This means typing `"Ama"` will still find `"Amazon"`. With partial matching off, it requires an exact case-insensitive match.
+ 
+---
+ 
+### 3. Date Range Filter — `dateFilterMatches()`
+ 
+This method checks whether a transaction falls within a user-specified start and end date. If no date range was entered, every transaction passes automatically.
+ 
+```java
+private static boolean dateFilterMatches(Transaction transaction, LocalDate startDate, LocalDate endDate) {
+    if (startDate == null || endDate == null) {
+        return true;
+    }
+ 
+    return !transaction.getDate().isBefore(startDate) && !transaction.getDate().isAfter(endDate);
+}
+```
+ 
+**How it works:** The `null` check lets users skip the date filter entirely. When a range is given, it uses Java's `LocalDate` comparison methods to confirm the transaction date is on or after the start date AND on or before the end date — both conditions must be true for the transaction to match.
+ 
+---
+ 
+### 4. Amount Range Filter — `amountFilterMatches()`
+ 
+This method checks whether a transaction's dollar amount falls within a min/max range. It uses `Math.abs()` so that payments (stored as negative numbers) are compared fairly alongside deposits.
+ 
+```java
+private static boolean amountFilterMatches(Transaction transaction, double minAmount, double maxAmount) {
+    double absoluteAmount = Math.abs(transaction.getAmount());
+    return absoluteAmount >= minAmount && absoluteAmount <= maxAmount;
+}
+```
+ 
+**How it works:** Since payments are stored as negative values (e.g., `-120.50`), comparing them directly to a positive min/max range would always fail. `Math.abs()` strips the sign so a `-$120.50` payment and a `$120.50` deposit are both treated as `$120.50` for filtering purposes.
+ 
+---
+ 
+### 5. Custom Search Orchestrator — `customSearch()`
+ 
+This is the method that ties everything together. It collects all the user's filter choices, then loops through every transaction and applies all five filters at once.
+ 
+```java
+public static void customSearch(ArrayList<Transaction> ledger) {
+    sortByMostRecent(ledger);
+    input.nextLine(); // clean buffer
+ 
+    Object[] filters = gatherSearchFilters();
+    String vendorFilter = (String) filters[0];
+    String descriptionFilter = (String) filters[1];
+    String typeFilter = (String) filters[2];
+    LocalDate startDate = (LocalDate) filters[3];
+    LocalDate endDate = (LocalDate) filters[4];
+    double minAmount = (double) filters[5];
+    double maxAmount = (double) filters[6];
+    boolean usePartialMatch = (boolean) filters[7];
+ 
+    double totalAmount = 0;
+    int resultCount = 0;
+ 
+    printStandaloneTitle("Transactions", 96, 146);
+ 
+    for (Transaction transaction : ledger) {
+        boolean matches = vendorFilterMatches(vendorFilter, transaction, usePartialMatch)
+                && descriptionFilterMatches(descriptionFilter, transaction, usePartialMatch)
+                && dateFilterMatches(transaction, startDate, endDate)
+                && typeFilterMatches(typeFilter, transaction)
+                && amountFilterMatches(transaction, minAmount, maxAmount);
+ 
+        if (matches) {
+            String look = getLook(transaction);
+            System.out.println(look);
+            totalAmount += transaction.getAmount();
+            resultCount++;
+        }
+    }
+ 
+    displaySearchResults(totalAmount, resultCount);
+}
+```
+ 
+**How it works:** First, the ledger is sorted newest-first. Then `gatherSearchFilters()` collects all the user's criteria and returns them packed into an `Object[]` array, which gets unpacked into typed variables. The `for` loop then runs every transaction through all five filter methods chained with `&&` — a transaction only prints if it passes every single filter. At the end, `displaySearchResults()` prints how many matches were found and their combined dollar total.
+ 
+---
  
 ## 👤 Author
  
