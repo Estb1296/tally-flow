@@ -9,6 +9,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+
 import static java.lang.String.format;
 
 public class AccountingApp {
@@ -612,34 +613,49 @@ public class AccountingApp {
                 System.out.println("The maximum amount has to be greater than the minimum");
                 maxAmount = getValidAmount("Enter maximum amount: ");
             }
+            minAmount=Math.abs(minAmount);
+            maxAmount=Math.abs(maxAmount);
         }
         boolean usePartialMatch = isUsePartialMatch();//isUsePartialMatch returns a boolean based on the user input
         printStandaloneTitle("Transactions", 96, 146);
         for (Transaction transaction : ledger) {
             boolean matches = true;
 
-            // Check Vendor filter
+            //Check Vendor filter
             // If Partial Search is applied it can search for the start of a vendor
+
             if (!vendorFilter.isEmpty()) {
                 if (usePartialMatch) {
-                    if (!transaction.getVendor().toLowerCase().contains(vendorFilter.toLowerCase())) {
+                    // Check BOTH directions
+                    boolean searchContainsVendor = vendorFilter.toLowerCase()
+                            .contains(transaction.getVendor().toLowerCase());
+                    boolean vendorContainsSearch = transaction.getVendor().toLowerCase()
+                            .contains(vendorFilter.toLowerCase());
+
+                    if (!searchContainsVendor && !vendorContainsSearch) {
                         matches = false;
                     }
                 } else {
-                    if (!transaction.getVendor().trim().equalsIgnoreCase(vendorFilter.trim())) {
+                    if (!transaction.getVendor().trim()
+                            .equalsIgnoreCase(vendorFilter.trim())) {
                         matches = false;
                     }
                 }
             }
             // Check description filter
-            // If Partial Search is applied it can search for the start of a description
             if (!descriptionFilter.isEmpty()) {
                 if (usePartialMatch) {
-                    if (!transaction.getDescription().toLowerCase().contains(descriptionFilter.toLowerCase())) {
+                    boolean searchContainsDesc = descriptionFilter.toLowerCase()
+                            .contains(transaction.getDescription().toLowerCase());
+                    boolean descContainsSearch = transaction.getDescription().toLowerCase()
+                            .contains(descriptionFilter.toLowerCase());
+
+                    if (!searchContainsDesc && !descContainsSearch) {
                         matches = false;
                     }
                 } else {
-                    if (!transaction.getDescription().trim().equalsIgnoreCase(descriptionFilter.trim())) {
+                    if (!transaction.getDescription().trim()
+                            .equalsIgnoreCase(descriptionFilter.trim())) {
                         matches = false;
                     }
                 }
@@ -663,7 +679,7 @@ public class AccountingApp {
             }
 
             // Check amount range filter
-            if (transaction.getAmount() < minAmount || transaction.getAmount() > maxAmount) {
+            if (Math.abs(transaction.getAmount()) < minAmount || Math.abs(transaction.getAmount()) > maxAmount) {
                 matches = false;
             }
             if (matches) {
