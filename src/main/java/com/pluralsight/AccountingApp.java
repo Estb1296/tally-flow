@@ -23,7 +23,6 @@ public class AccountingApp {
     private static final String border = "=".repeat(137);
 
     public static void main(String[] args) {
-        System.out.println("Good to go");
         promptAndLoadFileIfEmpty();
         runHomeScreen();
     }
@@ -84,8 +83,8 @@ public class AccountingApp {
             char choice = input.next().charAt(0);
             switch (choice) {
                 case '1' -> displayAllEntriesScreen(ledger);
-                case '2' -> depositsScreen(ledger);
-                case '3' -> paymentsScreen(ledger);
+                case '2' -> depositsScreen();
+                case '3' -> paymentsScreen();
                 case '4' -> runReportsScreen();
                 case '5' -> isRunning = false;
                 default -> System.out.println("Invalid input. Please try again.\n");
@@ -223,7 +222,7 @@ public class AccountingApp {
                 RESET);                                     // 10th %s - reset color
     }
 
-    public static void promptUserForDepositInfo(ArrayList<Transaction> ledger) {
+    public static void promptUserForDepositInfo() {
         double depositAmount = Math.abs(getValidAmount("How much do you want to deposit?"));
         System.out.printf("%.2f is the amount you have deposited into your account.\n", depositAmount);
 
@@ -237,7 +236,7 @@ public class AccountingApp {
 
     }
 
-    public static void addDepositToLedger(ArrayList<Transaction> ledger) {
+    public static void addDepositToLedger() {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -261,11 +260,11 @@ public class AccountingApp {
     }
 
     public static void handleNewDeposit() {
-        promptUserForDepositInfo(ledger);
-        addDepositToLedger(ledger);
+        promptUserForDepositInfo();
+        addDepositToLedger();
     }
 
-    public static void promptUserForPaymentInfo(ArrayList<Transaction> ledger) {
+    public static void promptUserForPaymentInfo() {
 
         double paymentAmount = Math.abs(getValidAmount("How much was the payment?"))*-1;
         System.out.printf("%.2f is the amount you have paid from your account\n", paymentAmount);
@@ -276,7 +275,7 @@ public class AccountingApp {
         ledger.add(new Transaction(date, time, description, vendor, paymentAmount));
     }
 
-    public static void processPaymentMade(ArrayList<Transaction> ledger) {
+    public static void processPaymentMade() {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -299,8 +298,8 @@ public class AccountingApp {
     }
 
     public static void handleNewPayment() {
-        promptUserForPaymentInfo(ledger);
-        processPaymentMade(ledger);
+        promptUserForPaymentInfo();
+        processPaymentMade();
     }
 
     public static LocalDate getValidDate(String prompt) {
@@ -388,7 +387,7 @@ public class AccountingApp {
         System.out.println(border);
     }
 
-    public static void displayPayments(ArrayList<Transaction> ledger) {
+    public static void displayPayments() {
         sortByMostRecent(ledger);
         double paymentTotal=0;
         int paymentCount=0;
@@ -406,14 +405,14 @@ public class AccountingApp {
         System.out.println(border);
     }
 
-    public static void depositsScreen(ArrayList<Transaction> ledger) {
+    public static void depositsScreen() {
         printStandaloneTitle("Deposits", 96, 146);
         displayDeposits(ledger);
     }
 
-    public static void paymentsScreen(ArrayList<Transaction> ledger) {
+    public static void paymentsScreen() {
         printStandaloneTitle("Payments", 96, 146);
-        displayPayments(ledger);
+        displayPayments();
     }
 
     /**
@@ -569,8 +568,10 @@ public class AccountingApp {
         String vendor = input.nextLine().trim();
         sortByMostRecent(ledger);
         printStandaloneTitle("Transactions", 96, 146);
+        String vendorInput = vendor.trim().toLowerCase();
         for (Transaction transaction : ledger) {
-            if (transaction.getVendor().equalsIgnoreCase(vendor)) {
+            String vendorValue = transaction.getVendor().trim().toLowerCase();
+            if (vendorInput.contains(vendorValue)||vendorValue.contains(vendorInput)) {
                 String look = getLook(transaction);
                 System.out.println(look);
                 resultCount++;
