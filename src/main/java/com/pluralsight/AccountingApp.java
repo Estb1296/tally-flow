@@ -369,7 +369,7 @@ public class AccountingApp {
         return userInput;
     }
 
-    public static void displayDeposits(ArrayList<Transaction> ledger) {
+    public static void displayDeposits() {
         sortByMostRecent(ledger);
         double depositTotal=0;
         int depositCount=0;
@@ -407,7 +407,7 @@ public class AccountingApp {
 
     public static void depositsScreen() {
         printStandaloneTitle("Deposits", 96, 146);
-        displayDeposits(ledger);
+        displayDeposits();
     }
 
     public static void paymentsScreen() {
