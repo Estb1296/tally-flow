@@ -866,7 +866,7 @@ public class AccountingApp {
         int resultCount = 0;
 
         printStandaloneTitle("Transactions", 96, 146);
-        boolean useAbsolute=true;
+        boolean useAbsolute = true;
 
         // Apply all filters to each transaction
         for (Transaction transaction : ledger) {
@@ -874,7 +874,7 @@ public class AccountingApp {
                     && descriptionFilterMatches(descriptionFilter, transaction, usePartialMatch)
                     && dateFilterMatches(transaction, startDate, endDate)
                     && typeFilterMatches(typeFilter, transaction)
-                    && amountFilterMatches(transaction, minAmount,maxAmount,useAbsolute);
+                    && amountFilterMatches(transaction, minAmount, maxAmount, useAbsolute);
 
             if (matches) {
                 String look = getLook(transaction);
