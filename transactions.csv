@@ -1011,3 +1011,14 @@ date|time|description|vendor|amount
 2026-04-30|19:49:32|Paycheck|Opex|250.00
 2026-05-01|08:43:12|PayCheck|ChickFilA|450.00
 2026-04-25|08:45:21|Apartment|Rent|-1525.00
+2026-05-01|11:18:37|Paycheck|Opex|450.00
+2026-05-01|11:39:02|Payout|Robinhood|2000.00
+2026-05-01|11:55:55|IRS TAX|Refund|4000.00
+2026-05-01|11:56:33|Car Payment|CarFAx|-450.00
+2026-05-01|12:05:59|Refund|Amazon|500.00
+2026-05-01|12:06:30|Online Order|Amazon|-200.00
+2026-05-01|12:29:05|Medication|Xander|250.00
+2026-05-01|12:29:44|Shoes|Amazon|-250.00
+2026-05-01|13:07:41|Chick Fil A|Paycheck|600.00
+2026-05-01|14:02:39|Payout|Youtube|6000.00
+

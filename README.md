@@ -304,10 +304,13 @@ public static void customSearch(ArrayList<Transaction> ledger) {
 ---
  
 ## 👤 Author
- 
+
 **Ezra Teshale**
 Year Up United | Java Focus LTCA — Spring 2026
+
 Instructor: Craig McKeachie
+
+Email : Ezra.Teshale12@gmail.com
  
 ---
  
