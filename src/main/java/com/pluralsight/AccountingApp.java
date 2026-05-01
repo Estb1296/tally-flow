@@ -668,9 +668,9 @@ public class AccountingApp {
 
         if (usePartialMatch) {
             boolean searchContainsVendor = vendorFilter.toLowerCase()
-                    .contains(transaction.getVendor().toLowerCase());
+                    .contains(transaction.getVendor().toLowerCase());// Amazon Inc
             boolean vendorContainsSearch = transaction.getVendor().toLowerCase()
-                    .contains(vendorFilter.toLowerCase());
+                    .contains(vendorFilter.toLowerCase());//Ama
             return searchContainsVendor || vendorContainsSearch;
         } else {
             return transaction.getVendor().trim().equalsIgnoreCase(vendorFilter.trim());
@@ -748,9 +748,35 @@ public class AccountingApp {
      * @param maxAmount   The maximum amount (inclusive)
      * @return true if the transaction amount is within range, false otherwise
      */
-    private static boolean amountFilterMatches(Transaction transaction, double minAmount, double maxAmount) {
-        double absoluteAmount = Math.abs(transaction.getAmount());
-        return absoluteAmount >= minAmount && absoluteAmount <= maxAmount;
+
+    private static boolean amountFilterMatches(Transaction transaction, double minAmount, double maxAmount, boolean useAbsolute) {
+// earlier I stripped the sign off every transaction amount using Math.abs().
+        //
+        if (useAbsolute) {
+            // strips signs off everything - good for finding $100-$200 regardless of deposit or payment
+            double absoluteAmount = Math.abs(transaction.getAmount());
+//            minAmount = Math.abs(minAmount);
+//            maxAmount = Math.abs(maxAmount);
+
+            if (minAmount > maxAmount) {
+                double temp = minAmount;
+                minAmount = maxAmount;
+                maxAmount = temp;
+            }
+
+            return absoluteAmount >= minAmount && absoluteAmount <= maxAmount;
+
+        }//useAbsolute is false, I compare the numbers exactly as they are on a mathematical number line.
+        else {
+            // raw comparison - good for exact ranges like -100000 to 4000
+            if (minAmount > maxAmount) {
+                double temp = minAmount;
+                minAmount = maxAmount;
+                maxAmount = temp;
+            }
+
+            return transaction.getAmount() >= minAmount && transaction.getAmount() <= maxAmount;
+        }
     }
 
     /**
@@ -791,8 +817,6 @@ public class AccountingApp {
                 System.out.println("The maximum amount has to be greater than the minimum");
                 maxAmount = getValidAmount("Enter maximum amount: ");
             }
-            minAmount = Math.abs(minAmount);
-            maxAmount = Math.abs(maxAmount);
         }
 
         boolean usePartialMatch = isUsePartialMatch();
@@ -842,6 +866,7 @@ public class AccountingApp {
         int resultCount = 0;
 
         printStandaloneTitle("Transactions", 96, 146);
+        boolean useAbsolute=true;
 
         // Apply all filters to each transaction
         for (Transaction transaction : ledger) {
@@ -849,7 +874,7 @@ public class AccountingApp {
                     && descriptionFilterMatches(descriptionFilter, transaction, usePartialMatch)
                     && dateFilterMatches(transaction, startDate, endDate)
                     && typeFilterMatches(typeFilter, transaction)
-                    && amountFilterMatches(transaction, minAmount, maxAmount);
+                    && amountFilterMatches(transaction, minAmount,maxAmount,useAbsolute);
 
             if (matches) {
                 String look = getLook(transaction);
