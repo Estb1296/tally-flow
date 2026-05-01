@@ -22,6 +22,7 @@ public class AccountingApp {
     public static final String CYAN = "\u001B[36m";
     private static final String border = "=".repeat(137);
     static String activeFile = "transactions.csv";
+
     public static void main(String[] args) {
         promptAndLoadFileIfEmpty();
         runHomeScreen();
@@ -690,11 +691,11 @@ public class AccountingApp {
         }
 
         if (usePartialMatch) {
-            boolean searchContainsDesc = descriptionFilter.toLowerCase()
+            boolean searchContainsDescription = descriptionFilter.toLowerCase()
                     .contains(transaction.getDescription().toLowerCase());
-            boolean descContainsSearch = transaction.getDescription().toLowerCase()
+            boolean descriptionContainsSearch = transaction.getDescription().toLowerCase()
                     .contains(descriptionFilter.toLowerCase());
-            return searchContainsDesc || descContainsSearch;
+            return searchContainsDescription || descriptionContainsSearch;
         } else {
             return transaction.getDescription().trim().equalsIgnoreCase(descriptionFilter.trim());
         }
@@ -782,7 +783,6 @@ public class AccountingApp {
                 endDate = getValidDate("Enter end date (yyyy-MM-dd): ");
             }
         }
-
         // Get amount range if requested
         if (amountRangeChoice.equalsIgnoreCase("yes")) {
             minAmount = getValidAmount("Enter minimum amount: ");
@@ -827,6 +827,7 @@ public class AccountingApp {
         input.nextLine(); // clean buffer
 
         // Gather all search criteria from user
+        // The Eight slots in the array Object
         Object[] filters = gatherSearchFilters();
         String vendorFilter = (String) filters[0];
         String descriptionFilter = (String) filters[1];
