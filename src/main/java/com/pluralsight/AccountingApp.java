@@ -21,7 +21,7 @@ public class AccountingApp {
     public static final String YELLOW = "\u001B[33m";
     public static final String CYAN = "\u001B[36m";
     private static final String border = "=".repeat(137);
-
+    static String activeFile = "transactions.csv";
     public static void main(String[] args) {
         promptAndLoadFileIfEmpty();
         runHomeScreen();
@@ -157,13 +157,11 @@ public class AccountingApp {
     }
 
     public static void promptAndLoadFileIfEmpty() {
-        loadTransactionsFromFile("transactions.csv");
-
+        loadTransactionsFromFile(activeFile);
         if (ledger.isEmpty()) {
             System.out.println("No transactions found in transactions.csv");
             System.out.println("Would you like to load a different file? (yes/no)");
             String choice = input.nextLine().trim();
-
             if (choice.equalsIgnoreCase("yes")) {
                 System.out.println("Enter the filename you want to load:");
                 String filename = getValidString("Filename: ");
@@ -175,6 +173,8 @@ public class AccountingApp {
     }
 
     public static void loadTransactionsFromFile(String filename) {
+        activeFile = filename;  // track whichever file is active
+        ledger.clear();
         readTransactionsFromFile(filename, ledger);
     }
 
@@ -240,7 +240,7 @@ public class AccountingApp {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
+            BufferedWriter writer = new BufferedWriter(new FileWriter(activeFile, true));  // true = append
             Transaction lastDeposit = ledger.get(ledger.size() - 1);
             String line = format("%s|%s|%s|%s|%.2f%n",
                     lastDeposit.getDate().format(dateFormatter),
@@ -279,7 +279,7 @@ public class AccountingApp {
         try {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            BufferedWriter writer = new BufferedWriter(new FileWriter("transactions.csv", true));  // true = append
+            BufferedWriter writer = new BufferedWriter(new FileWriter(activeFile, true));  // true = append
             Transaction lastPayment = ledger.get(ledger.size() - 1);
             String line = format("%s|%s|%s|%s|%.2f%n",
                     lastPayment.getDate().format(dateFormatter),
